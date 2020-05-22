@@ -7,10 +7,13 @@ import (
 func main() {
 	running := true
 	var opcion int
+
 	mostrarMenu()
+
 	for running {
-		fmt.Scanln(&opcion)
-		running = manejarOpciones(opcion)
+		if ret, _ := fmt.Scanln(&opcion); ret == 1 { //Scanea y guarda 1 en ret si el dato que leyo es del tipo de opcion. Esto restringe el scan a ints
+			running = manejarOpciones(opcion)
+		}
 	}
 }
 
@@ -38,7 +41,7 @@ func manejarOpciones(opcion int) bool {
 	case opcion == 6:
 		return false
 	default:
-		fmt.Print("Ingrese un numero valido")
+		fmt.Println("Ingrese un numero valido")
 	}
 	return true
 }
