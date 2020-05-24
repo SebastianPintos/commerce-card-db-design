@@ -37,6 +37,7 @@ func manejarOpciones(opcion int) bool {
 		sql.CrearTablas()
 		fmt.Println("Tablas creadas")
 	case opcion == 3:
+		sql.CrearPK();
 		fmt.Println("PK's & FK's creadas")
 	case opcion == 4:
 		fmt.Println("PK's & FK's borradas")
