@@ -148,12 +148,12 @@ func crearFK() {
 	_, err = db.Exec(`alter table tarjeta add constraint tarjeta_nrocliente_fk foreign key (nrocliente) references cliente(nrocliente);
 					  alter table compra add constraint compra_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
 					  alter table compra add constraint compra_nrocomercio_fk foreign key (nrocomercio) references comercio(nrocomercio);
-					  alter table compra add constraint rechazo_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
-					  alter table compra add constraint rechazo_nrocomercio_fk foreign key (nrocomercio) references comercio(nrocomercio);
-					  alter table compra add constraint cabecera_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
-					  alter table compra add constraint alerta_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
-					  alter table compra add constraint consumo_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
-					  alter table compra add constraint consumo_nrocomercio_fk foreign key (nrocomercio) references comercio(nrocomercio);`)	
+					  alter table rechazo add constraint rechazo_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
+					  alter table rechazo add constraint rechazo_nrocomercio_fk foreign key (nrocomercio) references comercio(nrocomercio);
+					  alter table cabecera add constraint cabecera_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
+					  alter table alerta add constraint alerta_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
+					  alter table consumo add constraint consumo_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
+					  alter table consumo add constraint consumo_nrocomercio_fk foreign key (nrocomercio) references comercio(nrocomercio);`)	
 
     if err != nil {
         log.Fatal(err)
@@ -206,6 +206,61 @@ func eliminarFK() {
     }
 	
 }
+/*
+func CargarDatos() {
+	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
 
+	_, err = db.Exec(`insert into cliente values(11348773,'Rocío', 'Losada','Av. Presidente Perón 1530',1151102983);
+					  insert into cliente values(12349972,'María Estela', 'Losada','Av. Presidente Perón 1530',1151102983);
+					  insert into cliente values(22648991,'Laura', 'Losada','Av. Presidente Perón 1530',1151102983);
+					  insert into cliente values(11341003,'Graciela', 'Losada','Av. Presidente Perón 1530',1151102983);
+					  insert into cliente values(51558783,'Gabriela', 'Losada','Av. Presidente Perón 1530',1151102983);
+					  insert into cliente values(21347800,'Marta', 'Losada','Av. Presidente Perón 1530',1151102983);
+					  insert into cliente values(11448979,'Belén', 'Losada','Av. Presidente Perón 1530',1151102983);
+					  insert into cliente values(44349773,'Abril', 'Losada','Av. Presidente Perón 1530',1151102983);
+					  insert into cliente values(33348679,'Sofía', 'Losada','Av. Presidente Perón 1530',1151102983);
+					  insert into cliente values(25348533,'Adriana', 'Losada','Av. Presidente Perón 1530',1151102983);
+					  insert into cliente values(12228777,'Juan Carlos', 'Losada','Av. Presidente Perón 1530',1151102983);
+					  insert into cliente values(32680014,'Alberto', 'Losada','Av. Presidente Perón 1530',1151102983);
+					  insert into cliente values(21545800,'Roberto', 'Losada','Av. Presidente Perón 1530',1151102983);
+					  insert into cliente values(23679022,'Mario', 'Losada','Av. Presidente Perón 1530',1151102983);
+					  insert into cliente values(12795452,'Lautaro', 'Losada','Av. Presidente Perón 1530',1151102983);
+					  insert into cliente values(11732790,'Bautista', 'Losada','Av. Presidente Perón 1530',1151102983);
+					  insert into cliente values(29546643,'Diego', 'Losada','Av. Presidente Perón 1530',1151102983);
+					  insert into cliente values(18397552,'Pedro', 'Losada','Av. Presidente Perón 1530',1151102983);
+					  insert into cliente values(13348765,'José', 'Losada','Av. Presidente Perón 1530',1151102983);
+					  insert into cliente values(14348789,'Ricardo', 'Losada','Av. Presidente Perón 1530',1151102983);
+					  
+					  insert into comercio values();
+					  insert into comercio values();
+					  insert into comercio values();
+					  insert into comercio values();
+					  insert into comercio values();
+					  insert into comercio values();
+					  insert into comercio values();
+					  insert into comercio values();
+					  insert into comercio values();
+					  insert into comercio values();
+					  insert into comercio values();
+					  insert into comercio values();
+					  insert into comercio values();
+					  insert into comercio values();
+					  insert into comercio values();
+					  insert into comercio values();
+					  insert into comercio values();
+					  insert into comercio values();
+					  insert into comercio values();
+					  insert into comercio values();
+					  insert into comercio values();
+					  `)	
 
+    if err != nil {
+        log.Fatal(err)
+    }
+	
+}*/
 
