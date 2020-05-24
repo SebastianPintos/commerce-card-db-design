@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+
+	"./sql"
 )
 
 func main() {
@@ -29,8 +31,10 @@ func mostrarMenu() {
 func manejarOpciones(opcion int) bool {
 	switch {
 	case opcion == 1:
+		sql.CrearDB()
 		fmt.Println("Base de datos creada")
 	case opcion == 2:
+		sql.CrearTablas()
 		fmt.Println("Tablas creadas")
 	case opcion == 3:
 		fmt.Println("PK's & FK's creadas")
