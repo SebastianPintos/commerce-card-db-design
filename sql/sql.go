@@ -256,6 +256,29 @@ func CargarDatos() {
 					  insert into comercio values(538,'COTO', 'Ohiggins 1280', 1661 ,46682636);
 					  insert into comercio values(553,'Disco', 'Av. Senador Morón 960', 1661 ,08107778888);
 					  
+					  insert into tarjeta values(4000001234567899,11348773, 201508, 202008, 733 ,50000,'vigente');
+					  insert into tarjeta values(4037001554363655,12349972, 201507, 202007, 332 ,55000,'vigente');
+					  insert into tarjeta values(4000001355435322,22648991, 201507, 202007, 201 ,60000,'vigente');
+					  insert into tarjeta values(4032011233774494,11341003, 201509, 202009, 204 ,120000,'vigente');
+					  insert into tarjeta values(4035055234867402,51558783, 201510, 202010, 108 ,150000,'vigente');
+					  insert into tarjeta values(4060001234507040,21347800, 201510, 202010, 909 ,110000,'vigente');
+					  insert into tarjeta values(4040071730767070,11448979, 201704, 202204, 810 ,57000,'vigente');
+					  insert into tarjeta values(4032002224865843,44349773, 201704, 202204, 327 ,64000,'suspendida');
+					  insert into tarjeta values(4034006634262869,33348679, 201708, 202208, 097 ,100000,'suspendida');
+					  insert into tarjeta values(4034001232557669,25348533, 201708, 202208, 653 ,140000,'suspendida');
+					  insert into tarjeta values(4032002134557009,12228777, 201801, 202301, 070 ,150000,'vigente');
+					  insert into tarjeta values(4033002233062344,32680014, 201801, 202301, 202,90000,'anulada');
+					  insert into tarjeta values(4000006877865030,21545800, 201801, 202301, 115 ,80000,'vigente');
+					  insert into tarjeta values(4000001223567822,23679022, 201604, 202104, 559 ,70000,'vigente');
+					  insert into tarjeta values(4000001244532899,12795452, 201604, 202104, 842 ,59000,'vigente');
+					  insert into tarjeta values(4032003238867044,11732790, 201602, 202102, 379 ,73000,'vigente');
+					  insert into tarjeta values(4000002440217199,29546643, 201601, 202101, 794 ,62000,'vigente');
+					  insert into tarjeta values(4032000435566909,18397552, 201701, 202201, 621 ,59000,'suspendida');
+					  insert into tarjeta values(4037055274760805,13348765, 201712, 202212, 109 ,69000,'anulada');
+					  insert into tarjeta values(4000632234361811,13348765, 201709, 202209, 195 ,53000,'suspendida');
+					  insert into tarjeta values(4000000203465800,14348789, 201808, 202308, 290 ,78000,'anulada');
+					  insert into tarjeta values(4003300224374894,14348789, 201809, 202309, 284 ,84000,'anulada');
+					  
 					  `)	
 
     if err != nil {
