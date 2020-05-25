@@ -43,6 +43,7 @@ func manejarOpciones(opcion int) bool {
 		sql.EliminarPKyFK();
 		fmt.Println("PK's & FK's borradas")
 	case opcion == 5:
+		sql.CargarDatos();
 		fmt.Println("Todos los datos cargados")
 	case opcion == 6:
 		return false

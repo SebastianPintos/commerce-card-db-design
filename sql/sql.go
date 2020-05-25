@@ -206,7 +206,7 @@ func eliminarFK() {
     }
 	
 }
-/*
+
 func CargarDatos() {
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
@@ -215,52 +215,31 @@ func CargarDatos() {
 	defer db.Close()
 
 	_, err = db.Exec(`insert into cliente values(11348773,'Rocío', 'Losada','Av. Presidente Perón 1530',1151102983);
-					  insert into cliente values(12349972,'María Estela', 'Losada','Av. Presidente Perón 1530',1151102983);
-					  insert into cliente values(22648991,'Laura', 'Losada','Av. Presidente Perón 1530',1151102983);
-					  insert into cliente values(11341003,'Graciela', 'Losada','Av. Presidente Perón 1530',1151102983);
-					  insert into cliente values(51558783,'Gabriela', 'Losada','Av. Presidente Perón 1530',1151102983);
-					  insert into cliente values(21347800,'Marta', 'Losada','Av. Presidente Perón 1530',1151102983);
-					  insert into cliente values(11448979,'Belén', 'Losada','Av. Presidente Perón 1530',1151102983);
-					  insert into cliente values(44349773,'Abril', 'Losada','Av. Presidente Perón 1530',1151102983);
-					  insert into cliente values(33348679,'Sofía', 'Losada','Av. Presidente Perón 1530',1151102983);
-					  insert into cliente values(25348533,'Adriana', 'Losada','Av. Presidente Perón 1530',1151102983);
-					  insert into cliente values(12228777,'Juan Carlos', 'Losada','Av. Presidente Perón 1530',1151102983);
-					  insert into cliente values(32680014,'Alberto', 'Losada','Av. Presidente Perón 1530',1151102983);
-					  insert into cliente values(21545800,'Roberto', 'Losada','Av. Presidente Perón 1530',1151102983);
-					  insert into cliente values(23679022,'Mario', 'Losada','Av. Presidente Perón 1530',1151102983);
-					  insert into cliente values(12795452,'Lautaro', 'Losada','Av. Presidente Perón 1530',1151102983);
-					  insert into cliente values(11732790,'Bautista', 'Losada','Av. Presidente Perón 1530',1151102983);
-					  insert into cliente values(29546643,'Diego', 'Losada','Av. Presidente Perón 1530',1151102983);
-					  insert into cliente values(18397552,'Pedro', 'Losada','Av. Presidente Perón 1530',1151102983);
-					  insert into cliente values(13348765,'José', 'Losada','Av. Presidente Perón 1530',1151102983);
-					  insert into cliente values(14348789,'Ricardo', 'Losada','Av. Presidente Perón 1530',1151102983);
+					  insert into cliente values(12349972,'María Estela', 'Martínez','Belgrano 1830',1150006655);
+					  insert into cliente values(22648991,'Laura', 'Santos','Italia 220',1153399452);
+					  insert into cliente values(11341003,'Graciela', 'Chasco','Tribulato 1340',1258579091);
+					  insert into cliente values(51558783,'Gabriela', 'Troncoso','Muñoz 1820',112234667);
+					  insert into cliente values(21347800,'Marta', 'Carbajo','San Luis 873',111998340);
+					  insert into cliente values(11448979,'Belén', 'Ferraris','Echeverría 780',113229087);
+					  insert into cliente values(44349773,'Abril', 'Hernández','Av. Sourdeaux 1700',115598342);
+					  insert into cliente values(33348679,'Sofía', 'Godoy','Av. Senador Morón 1221',114558004);
+					  insert into cliente values(25348533,'Adriana', 'Golluscio','Misiones 725',112111558);
+					  insert into cliente values(12228777,'Juan Carlos', 'Leguizamon','Serrano 120',1151101182);
+					  insert into cliente values(32680014,'Alberto', 'Ferrero','Pardo 990',1159944558);
+					  insert into cliente values(21545800,'Roberto', 'Ubertalli','Santa Fé 160',110076548);
+					  insert into cliente values(23679022,'Mario', 'Valdéz','Tucumán 550',116690874);
+					  insert into cliente values(12795452,'Lautaro', 'Flores','Río Diamante 186',113678652);
+					  insert into cliente values(11732790,'Bautista', 'Bello','Río Cuarto 191',111451419);
+					  insert into cliente values(29546643,'Diego', 'Fagnani','Av. Gaspar Campos 122',111009070);
+					  insert into cliente values(18397552,'Pedro', 'Tomarello','Av. San Martín 1511',110887547);
+					  insert into cliente values(13348765,'José', 'Mengarelli','Guido Spano 244',110044332);
+					  insert into cliente values(14348789,'Ricardo', 'Llanos','Corrientes 183',119034572);
 					  
-					  insert into comercio values();
-					  insert into comercio values();
-					  insert into comercio values();
-					  insert into comercio values();
-					  insert into comercio values();
-					  insert into comercio values();
-					  insert into comercio values();
-					  insert into comercio values();
-					  insert into comercio values();
-					  insert into comercio values();
-					  insert into comercio values();
-					  insert into comercio values();
-					  insert into comercio values();
-					  insert into comercio values();
-					  insert into comercio values();
-					  insert into comercio values();
-					  insert into comercio values();
-					  insert into comercio values();
-					  insert into comercio values();
-					  insert into comercio values();
-					  insert into comercio values();
 					  `)	
 
     if err != nil {
         log.Fatal(err)
     }
 	
-}*/
+}
 
