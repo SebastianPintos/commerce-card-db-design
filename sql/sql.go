@@ -235,6 +235,27 @@ func CargarDatos() {
 					  insert into cliente values(13348765,'José', 'Mengarelli','Guido Spano 244',110044332);
 					  insert into cliente values(14348789,'Ricardo', 'Llanos','Corrientes 183',119034572);
 					  
+					  insert into comercio values(501,'Kevingston', 'Av. Tte. Gral. Ricchieri 965', 1661 ,46666181);
+					  insert into comercio values(523,'47 street', 'Paunero 1575', 1663 ,47597581);
+					  insert into comercio values(513,'Garbarino', 'Av. Bartolomé Mitre 1198', 1661 ,08104440018);
+					  insert into comercio values(521,'Bella Vista Hogar', 'Av. Senador Morón 1094', 1661 ,46661544);
+					  insert into comercio values(578,'Panadería y Confitería: La Princesa', 'Av. Senador Morón 1200', 1661 ,46681339);
+					  insert into comercio values(564,'FOX', 'Av Pres. Juan Domingo Perón 907', 1663 ,46676777);
+					  insert into comercio values(569,'La Pata Loca', 'Av. Moisés Lebensohn 98', 1661 ,46660861);
+					  insert into comercio values(545,'Frávega', 'Av. Pres. Juan Domingo Perón 1127', 1663 ,44512063);
+					  insert into comercio values(543,'Spit Bella Vista', 'Av. Senador Morón 1452', 1661 ,1153519765);
+					  insert into comercio values(527,'Óptica Cristal', 'Av. Dr. Ricardo Balbín 1125', 1663 ,46649400);
+					  insert into comercio values(508,'Óptica Mattaldi', 'Av. Mattaldi 1141', 1661 ,46683911);
+					  insert into comercio values(509,'Estancia San Francisco San Miguel', 'Concejal Tribulato 1265', 1663 ,5446676082);
+					  insert into comercio values(500,'Rabelia heladería', 'San José 972', 1663 ,46649352);
+					  insert into comercio values(520,'Heladería Ciwe', 'San José 785', 1663 ,46646003);
+					  insert into comercio values(588,'Rever Pass', 'Paunero 1447,', 1663 ,44513921);
+					  insert into comercio values(582,'Rapsodia', 'Av. Pres. Arturo Umberto Illia 3770', 1663 ,1160911581);
+					  insert into comercio values(530,'Grimoldi', 'Paunero 1415', 1663 ,44517343);
+					  insert into comercio values(596,'Umma', 'Paunero 1476', 1663 ,44519267);
+					  insert into comercio values(538,'COTO', 'Ohiggins 1280', 1661 ,46682636);
+					  insert into comercio values(553,'Disco', 'Av. Senador Morón 960', 1661 ,08107778888);
+					  
 					  `)	
 
     if err != nil {
