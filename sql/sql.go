@@ -287,3 +287,56 @@ func CargarDatos() {
 	
 }
 
+func AutorizarCompra(){
+	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	_, err = db.Query(
+		`create or replace function autorizarcompra(_nrotarjeta char(16),_codseguridad char(4),_nrocomercio int, _monto decimal(7,2)) returns bool as $$
+		 declare
+			totalpendiente decimal(7,2);
+			montomaximo decimal(8,2);
+		 begin
+		
+			perform * from tarjeta where nrotarjeta=_nrotarjeta and estado='suspendida';
+		
+			if (found) then
+				raise 'La tarjeta se encuentra suspendida';
+				return False;
+			end if;
+
+			perform * from tarjeta where nrotarjeta=_nrotarjeta and estado='vigente';
+
+			if (not found) then
+				raise 'Tarjeta no válida';
+				return False;
+			end if;
+
+			perform * from tarjeta where nrotarjeta=_nrotarjeta and codseguridad=_codseguridad;
+
+			if (not found) then
+				raise 'Código de seguridad inválido';
+				return False;
+			end if;
+
+			totalpendiente:= (select sum(monto) from compra where nrotarjeta =_nrotarjeta and pagado=False);
+			montomaximo:= (select limitecompra from tarjeta where nrotarjeta=_nrotarjeta);
+	
+			if(totalpendiente is null and _monto > montomaximo or totalpendiente is not null and totalpendiente + _monto>montomaximo) then
+				raise notice 'Supera límite de tarjeta';
+				return False;
+			end if;
+
+			return True;
+		
+		end;
+	$$ language plpgsql;`)
+	
+	if err != nil {
+        log.Fatal(err)
+	}
+}
+
