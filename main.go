@@ -26,7 +26,8 @@ func mostrarMenu() {
 	fmt.Println("3) Crear PK's & FK's")
 	fmt.Println("4) Borrar PK's & FK's")
 	fmt.Println("5) Cargar todos los datos")
-	fmt.Println("6) Salir")
+	fmt.Println("6) Crear función para autorizar compra")
+	fmt.Println("7) Salir ")
 }
 func manejarOpciones(opcion int) bool {
 	switch {
@@ -48,6 +49,8 @@ func manejarOpciones(opcion int) bool {
 		fmt.Println("Todos los datos cargados")
 	case opcion == 6:
 		sql.AutorizarCompra();
+		fmt.Println("Función creada")		
+	case opcion == 7:
 		return false
 	default:
 		fmt.Println("Ingrese un numero valido")
