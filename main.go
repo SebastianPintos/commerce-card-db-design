@@ -31,6 +31,7 @@ func mostrarMenu() {
 func manejarOpciones(opcion int) bool {
 	switch {
 	case opcion == 1:
+		
 		sql.CrearDB()
 		fmt.Println("Base de datos creada")
 	case opcion == 2:
@@ -46,6 +47,7 @@ func manejarOpciones(opcion int) bool {
 		sql.CargarDatos();
 		fmt.Println("Todos los datos cargados")
 	case opcion == 6:
+		sql.AutorizarCompra();
 		return false
 	default:
 		fmt.Println("Ingrese un numero valido")

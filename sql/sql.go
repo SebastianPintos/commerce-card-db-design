@@ -52,7 +52,7 @@ func CrearTablas() {
 											domicilio text,
 											codigopostal text,
 											telefono char(12));
-		create table compra (nrooperacion int,
+		create table compra (nrooperacion serial,
 											nrotarjeta char(16),
 											nrocomercio int,
 											fecha timestamp,
@@ -330,7 +330,11 @@ func AutorizarCompra(){
 				return False;
 			end if;
 
+			insert into compra(nrotarjeta, nrocomercio, fecha, monto, pagado) values( _nrotarjeta, _nrocomercio, current_timestamp, _monto,False);
 			return True;
+		
+
+
 		
 		end;
 	$$ language plpgsql;`)
@@ -339,4 +343,6 @@ func AutorizarCompra(){
         log.Fatal(err)
 	}
 }
+
+
 
