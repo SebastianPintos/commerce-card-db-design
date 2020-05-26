@@ -328,7 +328,7 @@ func AutorizarCompra(){
 			montomaximo:= (select limitecompra from tarjeta where nrotarjeta=_nrotarjeta);
 	
 			if(totalpendiente is null and _monto > montomaximo or totalpendiente is not null and totalpendiente + _monto>montomaximo) then
-				perform agregarrechazo(_nrotarjeta, _nrocomercio,current_timestamp,_monto,cast('Supera límite de tarjeta' as text));
+				perform agregarrechazo(cast(_nrotarjeta as char(16)),cast(_nrocomercio as int),cast(current_timestamp as timestamp),cast(_monto as decimal(7,2)),cast('Supera límite de tarjeta' as text));
 				return False;
 			end if;
 
