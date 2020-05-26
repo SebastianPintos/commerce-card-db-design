@@ -105,17 +105,17 @@ func CrearTablas() {
 	}
 }
 
-func CrearPKyFK(){
-	crearPK();
-	crearFK();
+func CrearPKyFK() {
+	crearPK()
+	crearFK()
 }
 
-func EliminarPKyFK(){
-	eliminarFK();
-	eliminarPK();
+func EliminarPKyFK() {
+	eliminarFK()
+	eliminarPK()
 }
 
-func crearPK(){
+func crearPK() {
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
@@ -131,7 +131,7 @@ func crearPK(){
 	                  alter table cabecera add constraint cabecera_pk primary key (nroresumen);
 	                  alter table detalle add constraint detalle_pk primary key (nroresumen, nrolinea);
 	                  alter table alerta add constraint alerta_pk primary key (nroalerta);
-	                  alter table consumo add constraint consumo_pk primary key (nrotarjeta);`)	
+	                  alter table consumo add constraint consumo_pk primary key (nrotarjeta);`)
 
 	if err != nil {
 		log.Fatal(err)
@@ -153,15 +153,15 @@ func crearFK() {
 					  alter table cabecera add constraint cabecera_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
 					  alter table alerta add constraint alerta_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
 					  alter table consumo add constraint consumo_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
-					  alter table consumo add constraint consumo_nrocomercio_fk foreign key (nrocomercio) references comercio(nrocomercio);`)	
+					  alter table consumo add constraint consumo_nrocomercio_fk foreign key (nrocomercio) references comercio(nrocomercio);`)
 
-    if err != nil {
-        log.Fatal(err)
-    }
-	
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
 
-func eliminarPK(){
+func eliminarPK() {
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
@@ -177,7 +177,7 @@ func eliminarPK(){
 	                  alter table cabecera drop constraint cabecera_pk;
 	                  alter table detalle drop constraint detalle_pk;
 	                  alter table alerta drop constraint alerta_pk;
-	                  alter table consumo drop constraint consumo_pk;`)	
+	                  alter table consumo drop constraint consumo_pk;`)
 
 	if err != nil {
 		log.Fatal(err)
@@ -199,12 +199,12 @@ func eliminarFK() {
 					  alter table cabecera drop constraint cabecera_nrotarjeta_fk;
 					  alter table alerta drop constraint alerta_nrotarjeta_fk;
 					  alter table consumo drop constraint consumo_nrotarjeta_fk;
-					  alter table consumo drop constraint consumo_nrocomercio_fk;`)	
+					  alter table consumo drop constraint consumo_nrocomercio_fk;`)
 
-    if err != nil {
-        log.Fatal(err)
-    }
-	
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
 
 func CargarDatos() {
@@ -279,16 +279,16 @@ func CargarDatos() {
 					  insert into tarjeta values(4000000203465800,14348789, 201808, 202308, 290 ,78000,'anulada');
 					  insert into tarjeta values(4003300224374894,14348789, 201809, 202309, 284 ,84000,'anulada');
 					  
-					  `)	
+					  `)
 
-    if err != nil {
-        log.Fatal(err)
-    }
-	
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
 
-func AutorizarCompra(){
-	agregarRechazo();
+func AutorizarCompra() {
+	agregarRechazo()
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
@@ -300,6 +300,8 @@ func AutorizarCompra(){
 		 declare
 			totalpendiente decimal(7,2);
 			montomaximo decimal(8,2);
+			fechaVenceTarjeta int;
+			fechaVence date;
 			
 		 begin
 		
@@ -332,6 +334,16 @@ func AutorizarCompra(){
 				return False;
 			end if;
 
+			select validahasta into fechaVenceTarjeta from tarjeta where nrotarjeta=_nrotarjeta;
+
+			select into FechaVence to_date(fechaVenceTarjeta ||'01','YYYYMMDD');
+			select into FechaVence (FechaVence +  interval '1 month')::date;
+
+			if (FechaVence > current_date) then
+				raise 'Plazo de vigencia expirado';
+				return False;
+			end if;
+
 			insert into compra(nrotarjeta, nrocomercio, fecha, monto, pagado) values( _nrotarjeta, _nrocomercio, current_timestamp, _monto,False);
 			return True;
 		
@@ -340,13 +352,13 @@ func AutorizarCompra(){
 		
 		end;
 	$$ language plpgsql;`)
-	
+
 	if err != nil {
-        log.Fatal(err)
+		log.Fatal(err)
 	}
 }
 
-func agregarRechazo(){
+func agregarRechazo() {
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
@@ -362,8 +374,8 @@ func agregarRechazo(){
 		end;
 		
 	$$ language plpgsql;`)
-	
+
 	if err != nil {
-        log.Fatal(err)
+		log.Fatal(err)
 	}
 }
