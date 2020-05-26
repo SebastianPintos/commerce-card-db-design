@@ -58,7 +58,7 @@ func CrearTablas() {
 											fecha timestamp,
 											monto decimal(7,2),
 											pagado bool);
-		create table rechazo (nrorechazo int,
+		create table rechazo (nrorechazo serial,
 											nrotarjeta char(16),
 											nrocomercio int,
 											fecha timestamp,
@@ -194,12 +194,12 @@ func eliminarFK() {
 	_, err = db.Exec(`alter table tarjeta drop constraint tarjeta_nrocliente_fk;
 					  alter table compra drop constraint compra_nrotarjeta_fk;
 					  alter table compra drop constraint compra_nrocomercio_fk;
-					  alter table compra drop constraint rechazo_nrotarjeta_fk;
-					  alter table compra drop constraint rechazo_nrocomercio_fk;
-					  alter table compra drop constraint cabecera_nrotarjeta_fk;
-					  alter table compra drop constraint alerta_nrotarjeta_fk;
-					  alter table compra drop constraint consumo_nrotarjeta_fk;
-					  alter table compra drop constraint consumo_nrocomercio_fk;`)	
+					  alter table rechazo drop constraint rechazo_nrotarjeta_fk;
+					  alter table rechazo drop constraint rechazo_nrocomercio_fk;
+					  alter table cabecera drop constraint cabecera_nrotarjeta_fk;
+					  alter table alerta drop constraint alerta_nrotarjeta_fk;
+					  alter table consumo drop constraint consumo_nrotarjeta_fk;
+					  alter table consumo drop constraint consumo_nrocomercio_fk;`)	
 
     if err != nil {
         log.Fatal(err)
@@ -288,6 +288,7 @@ func CargarDatos() {
 }
 
 func AutorizarCompra(){
+	agregarRechazo();
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
@@ -299,26 +300,27 @@ func AutorizarCompra(){
 		 declare
 			totalpendiente decimal(7,2);
 			montomaximo decimal(8,2);
+			
 		 begin
 		
 			perform * from tarjeta where nrotarjeta=_nrotarjeta and estado='suspendida';
 		
 			if (found) then
-				raise 'La tarjeta se encuentra suspendida';
+				perform agregarrechazo(_nrotarjeta,_nrocomercio,current_timestamp,_monto,cast('La tarjeta se encuentra suspendida' as text));
 				return False;
 			end if;
 
 			perform * from tarjeta where nrotarjeta=_nrotarjeta and estado='vigente';
 
 			if (not found) then
-				raise 'Tarjeta no válida';
+				perform agregarrechazo(cast(_nrotarjeta as char(16)),cast(_nrocomercio as int),cast(current_timestamp as timestamp),cast(_monto as decimal(7,2)),cast('Tarjeta no válida' as text));
 				return False;
 			end if;
 
 			perform * from tarjeta where nrotarjeta=_nrotarjeta and codseguridad=_codseguridad;
 
 			if (not found) then
-				raise 'Código de seguridad inválido';
+				perform agregarrechazo(cast(_nrotarjeta as char(16)),cast(_nrocomercio as int),cast(current_timestamp as timestamp),cast(_monto as decimal(7,2)),cast('Número de seguridad inválido' as text));
 				return False;
 			end if;
 
@@ -326,7 +328,7 @@ func AutorizarCompra(){
 			montomaximo:= (select limitecompra from tarjeta where nrotarjeta=_nrotarjeta);
 	
 			if(totalpendiente is null and _monto > montomaximo or totalpendiente is not null and totalpendiente + _monto>montomaximo) then
-				raise notice 'Supera límite de tarjeta';
+				perform agregarrechazo(_nrotarjeta, _nrocomercio,current_timestamp,_monto,cast('Supera límite de tarjeta' as text));
 				return False;
 			end if;
 
@@ -344,5 +346,24 @@ func AutorizarCompra(){
 	}
 }
 
+func agregarRechazo(){
+	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
 
-
+	_, err = db.Query(
+		`create or replace function agregarrechazo(_nrotarjeta char(16),_nrocomercio int, _fecha timestamp,_monto decimal(7,2),_motivo text) returns void as $$
+		
+		begin
+		
+		insert into rechazo(nrotarjeta, nrocomercio, fecha, monto, motivo) values( _nrotarjeta, _nrocomercio, current_timestamp, _monto, _motivo);
+		end;
+		
+	$$ language plpgsql;`)
+	
+	if err != nil {
+        log.Fatal(err)
+	}
+}
