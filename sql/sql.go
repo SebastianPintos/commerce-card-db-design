@@ -284,7 +284,78 @@ func CargarDatos() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	_generarCierres();
 
+}
+
+func _generarCierres(){
+	generarCierres();
+	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	_, err = db.Query(
+		`select generarCierres(2020);`)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+}
+
+func generarCierres()  {
+	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	_, err = db.Query(
+		`
+		create or replace function generarCierres(año int)returns void as $$
+		declare
+		  fechainicio text;
+		  fechafin text;
+		  fechavto text;
+		  _mes int;
+		begin
+		for terminacion in 0..9 loop
+			for mes in 1..12 loop
+				_mes=mes+1;
+				if(mes=12) then
+					_mes=1;
+				end if;
+				if(mes<10 and _mes<10) then
+					fechainicio=concat(cast(año as text),'0',cast(mes as text),'01');
+					fechafin=concat(cast(año as text),'0',cast(_mes as text),'01');
+					fechavto=concat(cast(año as text),'0',cast(_mes as text),'15');
+				end if;
+				if(mes>=10 and _mes>=10) then
+					fechainicio=concat(cast(año as text),cast(mes as text),'01');
+					fechafin=concat(cast(año as text),cast(_mes as text),'01');
+					fechavto=concat(cast(año as text),cast(_mes as text),'15');
+				end if;
+				if(mes>=10 and _mes<10) then
+					fechainicio=concat(cast(año as text),cast(mes as text),'01');
+					fechafin=concat(cast(año as text),cast(_mes as text),'01');
+					fechavto=concat(cast(año as text),'0',cast(_mes as text),'15');
+				end if;
+				
+				insert into cierre values(año, mes, terminacion, to_date(fechainicio,'YYYYMMDD'), to_date(fechafin,'YYYYMMDD'), to_date(fechavto,'YYYYMMDD'));
+		
+			end loop;
+		end loop;
+	
+		end;
+		
+		$$ language plpgsql;`)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	
 }
 
 func AutorizarCompra() {
