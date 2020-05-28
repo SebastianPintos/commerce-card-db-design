@@ -340,7 +340,7 @@ func AutorizarCompra() {
 			select into FechaVence (FechaVence +  interval '1 month')::date;
 
 			if (FechaVence > current_date) then
-				raise 'Plazo de vigencia expirado';
+			perform agregarrechazo(cast(_nrotarjeta as char(16)),cast(_nrocomercio as int),cast(current_timestamp as timestamp),cast(_monto as decimal(7,2)),cast('Plazo de vigencia expirado' as text));
 				return False;
 			end if;
 
