@@ -27,7 +27,8 @@ func mostrarMenu() {
 	fmt.Println("4) Borrar PK's & FK's")
 	fmt.Println("5) Cargar todos los datos")
 	fmt.Println("6) Crear función para autorizar compra")
-	fmt.Println("7) Salir ")
+	fmt.Println("7) Agregar lógica de alertas por rechazo")
+	fmt.Println("8) Salir ")
 }
 func manejarOpciones(opcion int) bool {
 	switch {
@@ -51,6 +52,9 @@ func manejarOpciones(opcion int) bool {
 		sql.AutorizarCompra();
 		fmt.Println("Función creada")		
 	case opcion == 7:
+		sql.CrearTriggerRechazo();
+		fmt.Println("Se agregó lógica de alerta rechazo")
+	case opcion == 8:
 		return false
 	default:
 		fmt.Println("Ingrese un numero valido")
