@@ -72,7 +72,7 @@ func CrearTablas() {
 											fechacierre date,
 											fechavto date
 											);
-		create table cabecera(nroresumen serial,
+		create table cabecera(nroresumen int,
 											nombre text,
 											apellido text,
 											domicilio text,
@@ -151,7 +151,6 @@ func crearFK() {
 					  alter table rechazo add constraint rechazo_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
 					  alter table rechazo add constraint rechazo_nrocomercio_fk foreign key (nrocomercio) references comercio(nrocomercio);
 					  alter table cabecera add constraint cabecera_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
-					  alter table detalle add constraint detalle_cabecera_fk foreign key (nroresumen) references cabecera(nroresumen);
 					  alter table alerta add constraint alerta_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
 					  alter table consumo add constraint consumo_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
 					  alter table consumo add constraint consumo_nrocomercio_fk foreign key (nrocomercio) references comercio(nrocomercio);`)
@@ -314,29 +313,43 @@ func generarCierres() {
 	defer db.Close()
 
 	_, err = db.Query(
-		`create or replace function generarCierres(anio int) returns void as $$
-		Declare
-			fdesde date;
-			fhasta date;
-			fvto date;
-		BEGIN
-		
-			FOR tarjeta IN 1 .. 9 BY 1
-			LOOP
-				SELECT into fdesde to_date((anio - 1)::text || '12' || (select 23 + trunc(random() * 4))::text, 'YYYYMMDD');
-				SELECT into fhasta fdesde::date + cast((select 29 + trunc(random() * 2))::text || ' days' as interval);
-				SELECT into fvto fhasta::date + cast('10 days' as interval);
+		`
+		create or replace function generarCierres(año int)returns void as $$
+		declare
+		  fechainicio text;
+		  fechafin text;
+		  fechavto text;
+		  _mes int;
+		begin
+		for terminacion in 0..9 loop
+			for mes in 1..12 loop
+				_mes=mes+1;
+				if(mes=12) then
+					_mes=1;
+				end if;
+				if(mes<10 and _mes<10) then
+					fechainicio=concat(cast(año as text),'0',cast(mes as text),'01');
+					fechafin=concat(cast(año as text),'0',cast(_mes as text),'01');
+					fechavto=concat(cast(año as text),'0',cast(_mes as text),'15');
+				end if;
+				if(mes>=10 and _mes>=10) then
+					fechainicio=concat(cast(año as text),cast(mes as text),'01');
+					fechafin=concat(cast(año as text),cast(_mes as text),'01');
+					fechavto=concat(cast(año as text),cast(_mes as text),'15');
+				end if;
+				if(mes>=10 and _mes<10) then
+					fechainicio=concat(cast(año as text),cast(mes as text),'01');
+					fechafin=concat(cast(año as text),cast(_mes as text),'01');
+					fechavto=concat(cast(año as text),'0',cast(_mes as text),'15');
+				end if;
 				
-				FOR mes IN 1 .. 12 BY 1
-				LOOP			
-					insert into cierre values(anio,mes,tarjeta,fdesde,fhasta, fvto);
-					
-					SELECT into fdesde fhasta::date + cast('1 days' as interval);
-					SELECT into fhasta fdesde::date + cast((select 29 + trunc(random() * 2))::text || ' days' as interval);
-					SELECT into fvto fhasta::date + cast('10 days' as interval);
-				END LOOP;
-			END LOOP;
-		END;
+				insert into cierre values(año, mes, terminacion, to_date(fechainicio,'YYYYMMDD'), to_date(fechafin,'YYYYMMDD'), to_date(fechavto,'YYYYMMDD'));
+		
+			end loop;
+		end loop;
+	
+		end;
+		
 		$$ language plpgsql;`)
 
 	if err != nil {
@@ -476,6 +489,64 @@ func CrearTriggerRechazo() {
 			execute procedure agregar_alerta();
 		
 		`)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func GenerarResumen() {
+	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	_, err = db.Query(
+		`create or replace function generarresumen(_nrocliente int, _año int, _mes int) returns bool as $$
+	declare
+	
+	client record;
+	cards tarjeta%rowtype;
+	_compra compra%rowtype;
+	totalAPagar decimal(8,2);
+	_terminacion int;
+	_cierre record;
+
+	begin
+	select * into client from cliente where nrocliente=_nrocliente;
+		
+		if (not found) then
+			raise 'El cliente no existe';
+			return False;
+		end if;	
+
+	select * into cards from tarjeta where nrocliente=_nrocliente;
+	
+	if (not found) then
+		raise 'El cliente no tiene asociada ninguna tarjeta';
+		return False;
+	end if;
+
+
+	for card in select * from tarjeta where nrocliente=_nrocliente loop
+
+		select into _terminacion right(card.nrotarjeta::text, 1)::int;
+
+		select * into _cierre from cierre where año = _año and mes = _mes and terminacion = _terminacion;
+
+			for _compra in select * from compra where card.nrotarjeta = nrotarjeta  and 
+			_cierre.fechainicio < fecha::date and _cierre.fechacierre > fecha::date
+			loop
+			
+			
+			
+			end loop;
+	end loop;
+	return True;
+
+	end;
+	$$ language plpgsql;`)
 
 	if err != nil {
 		log.Fatal(err)
