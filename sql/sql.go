@@ -72,7 +72,7 @@ func CrearTablas() {
 											fechacierre date,
 											fechavto date
 											);
-		create table cabecera(nroresumen int,
+		create table cabecera(nroresumen serial,
 											nombre text,
 											apellido text,
 											domicilio text,
@@ -151,6 +151,7 @@ func crearFK() {
 					  alter table rechazo add constraint rechazo_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
 					  alter table rechazo add constraint rechazo_nrocomercio_fk foreign key (nrocomercio) references comercio(nrocomercio);
 					  alter table cabecera add constraint cabecera_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
+					  alter table detalle add constraint detalle_cabecera_fk foreign key (nroresumen) references cabecera(nroresumen);
 					  alter table alerta add constraint alerta_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
 					  alter table consumo add constraint consumo_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
 					  alter table consumo add constraint consumo_nrocomercio_fk foreign key (nrocomercio) references comercio(nrocomercio);`)
@@ -284,12 +285,12 @@ func CargarDatos() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_generarCierres();
+	_generarCierres()
 
 }
 
-func _generarCierres(){
-	generarCierres();
+func _generarCierres() {
+	generarCierres()
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
@@ -305,7 +306,7 @@ func _generarCierres(){
 
 }
 
-func generarCierres()  {
+func generarCierres() {
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
@@ -313,49 +314,35 @@ func generarCierres()  {
 	defer db.Close()
 
 	_, err = db.Query(
-		`
-		create or replace function generarCierres(año int)returns void as $$
-		declare
-		  fechainicio text;
-		  fechafin text;
-		  fechavto text;
-		  _mes int;
-		begin
-		for terminacion in 0..9 loop
-			for mes in 1..12 loop
-				_mes=mes+1;
-				if(mes=12) then
-					_mes=1;
-				end if;
-				if(mes<10 and _mes<10) then
-					fechainicio=concat(cast(año as text),'0',cast(mes as text),'01');
-					fechafin=concat(cast(año as text),'0',cast(_mes as text),'01');
-					fechavto=concat(cast(año as text),'0',cast(_mes as text),'15');
-				end if;
-				if(mes>=10 and _mes>=10) then
-					fechainicio=concat(cast(año as text),cast(mes as text),'01');
-					fechafin=concat(cast(año as text),cast(_mes as text),'01');
-					fechavto=concat(cast(año as text),cast(_mes as text),'15');
-				end if;
-				if(mes>=10 and _mes<10) then
-					fechainicio=concat(cast(año as text),cast(mes as text),'01');
-					fechafin=concat(cast(año as text),cast(_mes as text),'01');
-					fechavto=concat(cast(año as text),'0',cast(_mes as text),'15');
-				end if;
+		`create or replace function generarCierres(anio int) returns void as $$
+		Declare
+			fdesde date;
+			fhasta date;
+			fvto date;
+		BEGIN
+		
+			FOR tarjeta IN 1 .. 9 BY 1
+			LOOP
+				SELECT into fdesde to_date((anio - 1)::text || '12' || (select 23 + trunc(random() * 4))::text, 'YYYYMMDD');
+				SELECT into fhasta fdesde::date + cast((select 29 + trunc(random() * 2))::text || ' days' as interval);
+				SELECT into fvto fhasta::date + cast('10 days' as interval);
 				
-				insert into cierre values(año, mes, terminacion, to_date(fechainicio,'YYYYMMDD'), to_date(fechafin,'YYYYMMDD'), to_date(fechavto,'YYYYMMDD'));
-		
-			end loop;
-		end loop;
-	
-		end;
-		
+				FOR mes IN 1 .. 12 BY 1
+				LOOP			
+					insert into cierre values(anio,mes,tarjeta,fdesde,fhasta, fvto);
+					
+					SELECT into fdesde fhasta::date + cast('1 days' as interval);
+					SELECT into fhasta fdesde::date + cast((select 29 + trunc(random() * 2))::text || ' days' as interval);
+					SELECT into fvto fhasta::date + cast('10 days' as interval);
+				END LOOP;
+			END LOOP;
+		END;
 		$$ language plpgsql;`)
 
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 }
 
 func AutorizarCompra() {
@@ -473,8 +460,8 @@ func agregarAlertaRechazo() {
 	}
 }
 
-func CrearTriggerRechazo(){
-	agregarAlertaRechazo();
+func CrearTriggerRechazo() {
+	agregarAlertaRechazo()
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
@@ -494,8 +481,3 @@ func CrearTriggerRechazo(){
 		log.Fatal(err)
 	}
 }
-
-
-
-
-
