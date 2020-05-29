@@ -284,12 +284,12 @@ func CargarDatos() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_generarCierres();
+	_generarCierres()
 
 }
 
-func _generarCierres(){
-	generarCierres();
+func _generarCierres() {
+	generarCierres()
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
@@ -305,7 +305,7 @@ func _generarCierres(){
 
 }
 
-func generarCierres()  {
+func generarCierres() {
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
@@ -355,7 +355,7 @@ func generarCierres()  {
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 }
 
 func AutorizarCompra() {
@@ -473,8 +473,8 @@ func agregarAlertaRechazo() {
 	}
 }
 
-func CrearTriggerRechazo(){
-	agregarAlertaRechazo();
+func CrearTriggerRechazo() {
+	agregarAlertaRechazo()
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
@@ -495,7 +495,60 @@ func CrearTriggerRechazo(){
 	}
 }
 
+func GenerarResumen() {
+	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	_, err = db.Query(
+		`create or replace function generarresumen(_nrocliente int, _año int, _mes int) returns bool as $$
+	declare
+	
+	client record;
+	cards tarjeta%rowtype;
+	_compra compra%rowtype;
+	totalAPagar decimal(8,2);
+	_terminacion int;
+	_cierre record;
+
+	begin
+	select * into client from cliente where nrocliente=_nrocliente;
+		
+		if (not found) then
+			raise 'El cliente no existe';
+			return False;
+		end if;	
+
+	select * into cards from tarjeta where nrocliente=_nrocliente;
+	
+	if (not found) then
+		raise 'El cliente no tiene asociada ninguna tarjeta';
+		return False;
+	end if;
 
 
+	for card in select * from tarjeta where nrocliente=_nrocliente loop
 
+		select into _terminacion right(card.nrotarjeta::text, 1)::int;
 
+		select * into _cierre from cierre where año = _año and mes = _mes and terminacion = _terminacion;
+
+			for _compra in select * from compra where card.nrotarjeta = nrotarjeta  and 
+			_cierre.fechainicio < fecha::date and _cierre.fechacierre > fecha::date
+			loop
+			
+			
+			
+			end loop;
+	end loop;
+	return True;
+
+	end;
+	$$ language plpgsql;`)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
