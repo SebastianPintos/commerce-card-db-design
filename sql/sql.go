@@ -491,50 +491,60 @@ func GenerarResumen() {
 	defer db.Close()
 
 	_, err = db.Query(
-		`create or replace function generarresumen(_nrocliente int, _año int, _mes int) returns bool as $$
-	declare
-	
-	client record;
-	cards tarjeta%rowtype;
-	_compra compra%rowtype;
-	totalAPagar decimal(8,2);
-	_terminacion int;
-	_cierre record;
-
-	begin
-	select * into client from cliente where nrocliente=_nrocliente;
+		`create or replace function generarResumen(cliente int, anioR int, mesR int) returns bool as $$
+		declare
+			   idResumen int;
+			   totalPagar decimal(7,2) := 0;
+		   
+				begin		
+		-- 	Generar Cabecera
+				INSERT INTO cabecera (nombre, apellido, domicilio, nrotarjeta, desde, hasta, vence) 
+				SELECT cli.nombre, cli.apellido, cli.domicilio, t.nrotarjeta, c.fechainicio, c.fechacierre, c.fechavto
+					FROM public.tarjeta t, public.cierre c, public.cliente cli
+					WHERE SUBSTRING (t.nrotarjeta, LENGTH(t.nrotarjeta), 1)::int = c.terminacion
+					and cli.nrocliente = t.nrocliente
+					and t.nrocliente = cliente
+					and c.año = anioR
+					and c.mes = mesR
+				RETURNING nroresumen INTO idResumen;
+				
+				if (idResumen is null) then
+					raise 'No se pudo generar el resumen, Cliente inexistente';
+					return False;
+				end if;	
 		
-		if (not found) then
-			raise 'El cliente no existe';
-			return False;
-		end if;	
-
-	select * into cards from tarjeta where nrocliente=_nrocliente;
-	
-	if (not found) then
-		raise 'El cliente no tiene asociada ninguna tarjeta';
-		return False;
-	end if;
-
-
-	for card in select * from tarjeta where nrocliente=_nrocliente loop
-
-		select into _terminacion right(card.nrotarjeta::text, 1)::int;
-
-		select * into _cierre from cierre where año = _año and mes = _mes and terminacion = _terminacion;
-
-			for _compra in select * from compra where card.nrotarjeta = nrotarjeta  and 
-			_cierre.fechainicio < fecha::date and _cierre.fechacierre > fecha::date
-			loop
+		-- Generar detalle	
+				INSERT INTO detalle (nroresumen, nrolinea, fecha, nombrecomercio, monto) 
+				SELECT idResumen, ROW_NUMBER () OVER (ORDER BY t.nrotarjeta) as nrolinea, co.fecha, com.nombre , co.monto
+				FROM public.tarjeta t, public.cierre c, public.compra co, public.comercio com
+				WHERE SUBSTRING (t.nrotarjeta, LENGTH(t.nrotarjeta), 1)::int = c.terminacion
+				and co.nrotarjeta = t.nrotarjeta
+				and com.nrocomercio = co.nrocomercio
+				and t.nrocliente = cliente
+				and c.año = anioR
+				and c.mes = mesR
+				and co.fecha >= c.fechainicio 
+				and co.fecha <= c.fechacierre;	
+				
+				if (lastval() is NULL) then
+					raise 'No se pudo generar el resumen';
+					return False;
+				end if;	
 			
-			
-			
-			end loop;
-	end loop;
-	return True;
-
-	end;
-	$$ language plpgsql;`)
+		-- Actualizar Resumen
+				totalPagar := (SELECT SUM(monto) 
+							  FROM detalle 
+							  WHERE nroresumen = idResumen
+							  GROUP BY nroresumen);
+				if			 
+				UPDATE cabecera 
+				set total = totalPagar
+				WHERE nroresumen = idResumen;	
+				
+				return True;
+				
+				   end;
+		$$ language plpgsql;`)
 
 	if err != nil {
 		log.Fatal(err)
