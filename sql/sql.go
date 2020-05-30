@@ -313,32 +313,45 @@ func generarCierres() {
 	}
 	defer db.Close()
 
-	_, err = db.Query(
-		`
-		create or replace function generarCierres(anio int) returns void as $$
-		Declare
-			fdesde date;
-			fhasta date;
-			fvto date;
-		BEGIN
-		
-			FOR tarjeta IN 1 .. 9 BY 1
-			LOOP
-				SELECT into fdesde to_date((anio - 1)::text || '12' || (select 23 + trunc(random() * 4))::text, 'YYYYMMDD');
-				SELECT into fhasta fdesde::date + cast((select 29 + trunc(random() * 2))::text || ' days' as interval);
-				SELECT into fvto fhasta::date + cast('10 days' as interval);
-				
-				FOR mes IN 1 .. 12 BY 1
-				LOOP			
-					insert into cierre values(anio,mes,tarjeta,fdesde,fhasta, fvto);
-					
-					SELECT into fdesde fhasta::date + cast('1 days' as interval);
-					SELECT into fhasta fdesde::date + cast((select 29 + trunc(random() * 2))::text || ' days' as interval);
-					SELECT into fvto fhasta::date + cast('10 days' as interval);
-				END LOOP;
-			END LOOP;
-		END;
-		$$ language plpgsql;`)
+	_, err = db.Query(`
+	create or replace function generarCierres(año int)returns void as $$
+	declare
+	  fechainicio text;
+	  fechafin text;
+	  fechavto text;
+	  _mes int;
+	begin
+	for terminacion in 0..9 loop
+		for mes in 1..12 loop
+			_mes=mes+1;
+			if(mes=12) then
+				_mes=1;
+			end if;
+			if(mes<10 and _mes<10) then
+				fechainicio=concat(cast(año as text),'0',cast(mes as text),'01');
+				fechafin=concat(cast(año as text),'0',cast(_mes as text),'01');
+				fechavto=concat(cast(año as text),'0',cast(_mes as text),'15');
+			end if;
+			if(mes>=10 and _mes>=10) then
+				fechainicio=concat(cast(año as text),cast(mes as text),'01');
+				fechafin=concat(cast(año as text),cast(_mes as text),'01');
+				fechavto=concat(cast(año as text),cast(_mes as text),'15');
+			end if;
+			if(mes>=10 and _mes<10) then
+				fechainicio=concat(cast(año as text),cast(mes as text),'01');
+				fechafin=concat(cast(año as text),cast(_mes as text),'01');
+				fechavto=concat(cast(año as text),'0',cast(_mes as text),'15');
+			end if;
+			
+			insert into cierre values(año, mes, terminacion, to_date(fechainicio,'YYYYMMDD'), to_date(fechafin,'YYYYMMDD'), to_date(fechavto,'YYYYMMDD'));
+	
+		end loop;
+	end loop;
+
+	end;
+	
+	$$ language plpgsql;`)
+
 
 	if err != nil {
 		log.Fatal(err)
