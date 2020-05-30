@@ -88,7 +88,7 @@ func CrearTablas() {
 											nombrecomercio text,
 											monto decimal(7,2)
 											);
-		create table alerta (nroalerta serial,
+		create table alerta (nroalerta int,
 											nrotarjeta char(16),
 											fecha timestamp,
 											nrorechazo int,
@@ -198,7 +198,7 @@ func eliminarFK() {
 					  alter table rechazo drop constraint rechazo_nrotarjeta_fk;
 					  alter table rechazo drop constraint rechazo_nrocomercio_fk;
 					  alter table cabecera drop constraint cabecera_nrotarjeta_fk;
-					  alter table detalle drop constraint detalle_cabecera_fk;
+					  alter table detalle drop constraint detalle_cabecera_fk; 
 					  alter table alerta drop constraint alerta_nrotarjeta_fk;
 					  alter table consumo drop constraint consumo_nrotarjeta_fk;
 					  alter table consumo drop constraint consumo_nrocomercio_fk;`)
@@ -287,10 +287,9 @@ func CargarDatos() {
 		log.Fatal(err)
 	}
 	_generarCierres()
-
 }
 
-func _generarCierres() {
+func _generarCierres(){
 	generarCierres()
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
@@ -307,58 +306,59 @@ func _generarCierres() {
 
 }
 
-func generarCierres() {
+func generarCierres()  {
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	_, err = db.Query(`
-	create or replace function generarCierres(año int)returns void as $$
-	declare
-	  fechainicio text;
-	  fechafin text;
-	  fechavto text;
-	  _mes int;
-	begin
-	for terminacion in 0..9 loop
-		for mes in 1..12 loop
-			_mes=mes+1;
-			if(mes=12) then
-				_mes=1;
-			end if;
-			if(mes<10 and _mes<10) then
-				fechainicio=concat(cast(año as text),'0',cast(mes as text),'01');
-				fechafin=concat(cast(año as text),'0',cast(_mes as text),'01');
-				fechavto=concat(cast(año as text),'0',cast(_mes as text),'15');
-			end if;
-			if(mes>=10 and _mes>=10) then
-				fechainicio=concat(cast(año as text),cast(mes as text),'01');
-				fechafin=concat(cast(año as text),cast(_mes as text),'01');
-				fechavto=concat(cast(año as text),cast(_mes as text),'15');
-			end if;
-			if(mes>=10 and _mes<10) then
-				fechainicio=concat(cast(año as text),cast(mes as text),'01');
-				fechafin=concat(cast(año as text),cast(_mes as text),'01');
-				fechavto=concat(cast(año as text),'0',cast(_mes as text),'15');
-			end if;
-			
-			insert into cierre values(año, mes, terminacion, to_date(fechainicio,'YYYYMMDD'), to_date(fechafin,'YYYYMMDD'), to_date(fechavto,'YYYYMMDD'));
-	
+	_, err = db.Query(
+		`
+		create or replace function generarCierres(año int)returns void as $$
+		declare
+		  fechainicio text;
+		  fechafin text;
+		  fechavto text;
+		  _mes int;
+		begin
+		for terminacion in 0..9 loop
+			for mes in 1..12 loop
+				_mes=mes+1;
+				if(mes=12) then
+					_mes=1;
+				end if;
+				if(mes<10 and _mes<10) then
+					fechainicio=concat(cast(año as text),'0',cast(mes as text),'01');
+					fechafin=concat(cast(año as text),'0',cast(_mes as text),'01');
+					fechavto=concat(cast(año as text),'0',cast(_mes as text),'15');
+				end if;
+				if(mes>=10 and _mes>=10) then
+					fechainicio=concat(cast(año as text),cast(mes as text),'01');
+					fechafin=concat(cast(año as text),cast(_mes as text),'01');
+					fechavto=concat(cast(año as text),cast(_mes as text),'15');
+				end if;
+				if(mes>=10 and _mes<10) then
+					fechainicio=concat(cast(año as text),cast(mes as text),'01');
+					fechafin=concat(cast(año as text),cast(_mes as text),'01');
+					fechavto=concat(cast(año as text),'0',cast(_mes as text),'15');
+				end if;
+				
+				insert into cierre values(año, mes, terminacion, to_date(fechainicio,'YYYYMMDD'), to_date(fechafin,'YYYYMMDD'), to_date(fechavto,'YYYYMMDD'));
+		
+			end loop;
 		end loop;
-	end loop;
-
-	end;
 	
-	$$ language plpgsql;`)
-
+		end;
+		
+		$$ language plpgsql;`)
 
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	
 }
+
 
 func AutorizarCompra() {
 	agregarRechazo()
@@ -447,50 +447,6 @@ func agregarRechazo() {
 		end;
 		
 	$$ language plpgsql;`)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func agregarAlertaRechazo() {
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	_, err = db.Query(
-		`create or replace function agregar_alerta() returns trigger as $$
-		begin
-
-		insert into alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion) values(new.nrotarjeta, new.fecha, new.nrorechazo, 0, new.motivo);
-		return null;
-		end;
-		
-	$$ language plpgsql;`)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func CrearTriggerRechazo() {
-	agregarAlertaRechazo()
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	_, err = db.Query(
-		`create trigger agregarrechazo_trg
-		before insert on rechazo
-	
-		for each row
-			execute procedure agregar_alerta();
-		
-		`)
 
 	if err != nil {
 		log.Fatal(err)

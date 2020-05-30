@@ -40,19 +40,19 @@ func manejarOpciones(opcion int) bool {
 		sql.CrearTablas()
 		fmt.Println("Tablas creadas")
 	case opcion == 3:
-		sql.CrearPKyFK();
+		sql.CrearPKyFK()
 		fmt.Println("PK's & FK's creadas")
 	case opcion == 4:
-		sql.EliminarPKyFK();
+		sql.EliminarPKyFK()
 		fmt.Println("PK's & FK's borradas")
 	case opcion == 5:
-		sql.CargarDatos();
+		sql.CargarDatos()
 		fmt.Println("Todos los datos cargados")
 	case opcion == 6:
-		sql.AutorizarCompra();
+		sql.AutorizarCompra()
 		fmt.Println("Función creada")		
 	case opcion == 7:
-		sql.CrearTriggerRechazo();
+	//	sql.CrearTriggerRechazo();
 		fmt.Println("Se agregó lógica de alerta rechazo")
 	case opcion == 8:
 		return false
