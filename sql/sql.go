@@ -289,7 +289,7 @@ func CargarDatos() {
 	_generarCierres()
 }
 
-func _generarCierres(){
+func _generarCierres() {
 	generarCierres()
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
@@ -306,7 +306,7 @@ func _generarCierres(){
 
 }
 
-func generarCierres()  {
+func generarCierres() {
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
@@ -356,9 +356,8 @@ func generarCierres()  {
 	if err != nil {
 		log.Fatal(err)
 	}
-	
-}
 
+}
 
 func AutorizarCompra() {
 	agregarRechazo()
@@ -412,7 +411,7 @@ func AutorizarCompra() {
 			select into FechaVence to_date(fechaVenceTarjeta ||'01','YYYYMMDD');
 			select into FechaVence (FechaVence +  interval '1 month')::date;
 
-			if (FechaVence > current_date) then
+			if (FechaVence < current_date) then
 			perform agregarrechazo(cast(_nrotarjeta as char(16)),cast(_nrocomercio as int),cast(current_timestamp as timestamp),cast(_monto as decimal(7,2)),cast('Plazo de vigencia expirado' as text));
 				return False;
 			end if;
