@@ -198,6 +198,7 @@ func eliminarFK() {
 					  alter table rechazo drop constraint rechazo_nrotarjeta_fk;
 					  alter table rechazo drop constraint rechazo_nrocomercio_fk;
 					  alter table cabecera drop constraint cabecera_nrotarjeta_fk;
+					  alter table detalle drop constraint detalle_cabecera_fk;
 					  alter table alerta drop constraint alerta_nrotarjeta_fk;
 					  alter table consumo drop constraint consumo_nrotarjeta_fk;
 					  alter table consumo drop constraint consumo_nrocomercio_fk;`)
