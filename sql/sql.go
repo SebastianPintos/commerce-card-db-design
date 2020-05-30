@@ -380,7 +380,7 @@ func AutorizarCompra() {
 			perform * from tarjeta where nrotarjeta=_nrotarjeta and estado='suspendida';
 		
 			if (found) then
-				perform agregarrechazo(_nrotarjeta,_nrocomercio,current_timestamp,_monto,cast('La tarjeta se encuentra suspendida' as text));
+				perform agregarrechazo(cast(_nrotarjeta as char(16)),cast(_nrocomercio as int),cast(current_timestamp as timestamp),cast(_monto as decimal(7,2)),cast('La tarjeta se encuentra suspendida' as text));
 				return False;
 			end if;
 
