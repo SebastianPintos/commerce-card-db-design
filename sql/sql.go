@@ -130,8 +130,7 @@ func crearPK() {
 	                  alter table cierre add constraint cierre_pk primary key (año, mes, terminacion);
 	                  alter table cabecera add constraint cabecera_pk primary key (nroresumen);
 	                  alter table detalle add constraint detalle_pk primary key (nroresumen, nrolinea);
-	                  alter table alerta add constraint alerta_pk primary key (nroalerta);
-	                  alter table consumo add constraint consumo_pk primary key (nrotarjeta);`)
+	                  alter table alerta add constraint alerta_pk primary key (nroalerta);`)
 
 	if err != nil {
 		log.Fatal(err)
@@ -153,8 +152,7 @@ func crearFK() {
 					  alter table cabecera add constraint cabecera_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
 					  alter table detalle add constraint detalle_cabecera_fk foreign key (nroresumen) references cabecera(nroresumen);
 					  alter table alerta add constraint alerta_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
-					  alter table consumo add constraint consumo_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
-					  alter table consumo add constraint consumo_nrocomercio_fk foreign key (nrocomercio) references comercio(nrocomercio);`)
+					`)
 
 	if err != nil {
 		log.Fatal(err)
@@ -178,7 +176,7 @@ func eliminarPK() {
 	                  alter table cabecera drop constraint cabecera_pk;
 	                  alter table detalle drop constraint detalle_pk;
 	                  alter table alerta drop constraint alerta_pk;
-	                  alter table consumo drop constraint consumo_pk;`)
+	                `)
 
 	if err != nil {
 		log.Fatal(err)
@@ -199,9 +197,7 @@ func eliminarFK() {
 					  alter table rechazo drop constraint rechazo_nrocomercio_fk;
 					  alter table cabecera drop constraint cabecera_nrotarjeta_fk;
 					  alter table detalle drop constraint detalle_cabecera_fk; 
-					  alter table alerta drop constraint alerta_nrotarjeta_fk;
-					  alter table consumo drop constraint consumo_nrotarjeta_fk;
-					  alter table consumo drop constraint consumo_nrocomercio_fk;`)
+					  alter table alerta drop constraint alerta_nrotarjeta_fk;`)
 
 	if err != nil {
 		log.Fatal(err)
@@ -429,6 +425,39 @@ func AutorizarCompra() {
 		log.Fatal(err)
 	}
 }
+func GenerarConsumo(){
+	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	_, err = db.Query(
+		`
+		create or replace function generarConsumo(cantidad int)returns void as $$
+		declare
+		  tarjetaAleatoria record;
+		  comercioAleatorio int;
+		  montoAleatorio decimal(7,2);
+		begin
+
+		for _consumo in 0..cantidad-1 loop
+			select into montoAleatorio ((random() * (100000 - 100)) + 100) as aleatorio;
+			select into comercioAleatorio nrocomercio from comercio order by random() limit 1;
+			select into tarjetaAleatoria * from tarjeta order by random() limit 1;
+			insert into consumo values(tarjetaAleatoria.nrotarjeta, tarjetaAleatoria.codseguridad, comercioAleatorio, montoAleatorio);
+		end loop;
+		end;
+		
+		$$ language plpgsql;`)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	
+}
+
+
 
 func agregarRechazo() {
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")

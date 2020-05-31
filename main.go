@@ -55,6 +55,7 @@ func manejarOpciones(opcion int) bool {
 	//	sql.CrearTriggerRechazo();
 		fmt.Println("Se agregó lógica de alerta rechazo")
 	case opcion == 8:
+		sql.GenerarConsumo();
 		return false
 	default:
 		fmt.Println("Ingrese un numero valido")
