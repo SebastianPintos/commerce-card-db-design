@@ -26,8 +26,8 @@ func mostrarMenu() {
 	fmt.Println("3) Crear PK's & FK's")
 	fmt.Println("4) Borrar PK's & FK's")
 	fmt.Println("5) Cargar todos los datos")
-	fmt.Println("6) Crear función para autorizar compra")
-	fmt.Println("7) Agregar lógica de alertas por rechazo")
+	fmt.Println("6) Agregar lógica de consumo virtual")
+	fmt.Println("7) Agregar lógica de alertas")
 	fmt.Println("8) Salir ")
 }
 func manejarOpciones(opcion int) bool {
@@ -49,13 +49,12 @@ func manejarOpciones(opcion int) bool {
 		sql.CargarDatos()
 		fmt.Println("Todos los datos cargados")
 	case opcion == 6:
-		sql.AutorizarCompra()
+		sql.GenerarLogicaConsumo()
 		fmt.Println("Función creada")		
 	case opcion == 7:
 	//	sql.CrearTriggerRechazo();
-		fmt.Println("Se agregó lógica de alerta rechazo")
+		fmt.Println("Se agregó lógica de alertas")
 	case opcion == 8:
-		sql.GenerarConsumo();
 		return false
 	default:
 		fmt.Println("Ingrese un numero valido")

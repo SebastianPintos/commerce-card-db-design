@@ -282,7 +282,7 @@ func CargarDatos() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_generarCierres()
+	_generarCierres()	
 }
 
 func _generarCierres() {
@@ -355,7 +355,7 @@ func generarCierres() {
 
 }
 
-func AutorizarCompra() {
+func autorizarCompra() {
 	agregarRechazo()
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
@@ -425,7 +425,15 @@ func AutorizarCompra() {
 		log.Fatal(err)
 	}
 }
-func GenerarConsumo(){
+
+func GenerarLogicaConsumo(){
+	autorizarCompra()
+	crearTriggerRechazo()
+	crearTriggerConsumo()
+	generarConsumo()	
+}
+
+func generarConsumo(){
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
@@ -442,7 +450,7 @@ func GenerarConsumo(){
 		begin
 
 		for _consumo in 0..cantidad-1 loop
-			select into montoAleatorio ((random() * (100000 - 100)) + 100) as aleatorio;
+			select into montoAleatorio ((random() * (80000 - 100)) + 100) as aleatorio;
 			select into comercioAleatorio nrocomercio from comercio order by random() limit 1;
 			select into tarjetaAleatoria * from tarjeta order by random() limit 1;
 			insert into consumo values(tarjetaAleatoria.nrotarjeta, tarjetaAleatoria.codseguridad, comercioAleatorio, montoAleatorio);
@@ -454,10 +462,51 @@ func GenerarConsumo(){
 	if err != nil {
 		log.Fatal(err)
 	}
-	
 }
 
+func crearTriggerConsumo(){
+	agregarTestConsumo();
+	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
 
+	_, err = db.Query(
+		`create trigger agregarconsumo_trg
+		before insert on consumo
+	
+		for each row
+			execute procedure testear_consumo();
+		
+		`)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func agregarTestConsumo() {
+	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	_, err = db.Query(
+		`create or replace function testear_consumo() returns trigger as $$
+		begin
+
+		perform autorizarcompra(new.nrotarjeta,new.codseguridad, new.nrocomercio,new.monto);
+		return new;
+		end;
+		
+	$$ language plpgsql;`)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 func agregarRechazo() {
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
@@ -475,6 +524,50 @@ func agregarRechazo() {
 		end;
 		
 	$$ language plpgsql;`)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func agregarAlertaRechazo() {
+	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	_, err = db.Query(
+		`create or replace function agregar_alerta() returns trigger as $$
+		begin
+
+		insert into alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion) values(new.nrotarjeta, new.fecha, new.nrorechazo, 0, new.motivo);
+		return new;
+		end;
+		
+	$$ language plpgsql;`)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func crearTriggerRechazo(){
+	agregarAlertaRechazo();
+	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	_, err = db.Query(
+		`create trigger agregarrechazo_trg
+		before insert on rechazo
+	
+		for each row
+			execute procedure agregar_alerta();
+		
+		`)
 
 	if err != nil {
 		log.Fatal(err)
@@ -548,53 +641,6 @@ func GenerarResumen() {
 		log.Fatal(err)
 	}
 }
-
-
-func agregarAlertaRechazo() {
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	_, err = db.Query(
-		`create or replace function agregar_alerta() returns trigger as $$
-		begin
-
-		insert into alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion) values(new.nrotarjeta, new.fecha, new.nrorechazo, 0, new.motivo);
-		return null;
-		end;
-		
-	$$ language plpgsql;`)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func CrearTriggerRechazo(){
-	agregarAlertaRechazo();
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	_, err = db.Query(
-		`create trigger agregarrechazo_trg
-		before insert on rechazo
-	
-		for each row
-			execute procedure agregar_alerta();
-		
-		`)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-
 
 
 
