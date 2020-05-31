@@ -82,13 +82,13 @@ func CrearTablas() {
 											vence date,
 											total decimal(8,2)
 											);
-		create table detalle(nroresumen int,
+		create table detalle(nroresumen serial,
 											nrolinea int,
 											fecha date,
 											nombrecomercio text,
 											monto decimal(7,2)
 											);
-		create table alerta (nroalerta int,
+		create table alerta (nroalerta serial,
 											nrotarjeta char(16),
 											fecha timestamp,
 											nrorechazo int,
@@ -519,3 +519,53 @@ func GenerarResumen() {
 		log.Fatal(err)
 	}
 }
+
+
+func agregarAlertaRechazo() {
+	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	_, err = db.Query(
+		`create or replace function agregar_alerta() returns trigger as $$
+		begin
+
+		insert into alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion) values(new.nrotarjeta, new.fecha, new.nrorechazo, 0, new.motivo);
+		return null;
+		end;
+		
+	$$ language plpgsql;`)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func CrearTriggerRechazo(){
+	agregarAlertaRechazo();
+	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	_, err = db.Query(
+		`create trigger agregarrechazo_trg
+		before insert on rechazo
+	
+		for each row
+			execute procedure agregar_alerta();
+		
+		`)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+
+
+
+
