@@ -92,8 +92,10 @@ Este código, también deberá ejecutarse desde una aplicación CLI escrita en G
 
 == Descripción
 El programa se organiza en dos carpetas y un archivo escrito en Go que sirve como aplicación CLI:
+
 - Carpeta sql:
 * Contiene toda la lógica asociada a los ítems: Creación de la base de datos, Instancia de los datos y Stored procedures o triggers. 
+
 - Descripción de los métodos:
 * CrearDB(): Creación de la Base de Datos.
 * CrearTablas(): Creación de las tablas especificadas.
