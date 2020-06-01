@@ -76,6 +76,9 @@ func CargarCliente(db *bolt.DB, nrocliente int, nombre string, apellido string, 
 	}
 
 	CreateUpdate(db, "Cliente", []byte(strconv.Itoa(cliente.Nrocliente)), data)
+
+	// consulta, err := ReadUnique(db, "Cliente", []byte(strconv.Itoa(cliente.Nrocliente)))
+	// fmt.Printf("%s\n", consulta)
 }
 
 func CargarTarjeta(db *bolt.DB, nrotarjeta string, nrocliente int, validadesde string, validahasta string, codseguridad string, limitecompra int, estado string) {
@@ -87,6 +90,9 @@ func CargarTarjeta(db *bolt.DB, nrotarjeta string, nrocliente int, validadesde s
 	}
 
 	CreateUpdate(db, "Tarjeta", []byte(strconv.Itoa(tarjeta.Nrocliente)), data)
+
+	// consulta, err := ReadUnique(db, "Tarjeta", []byte(strconv.Itoa(tarjeta.Nrocliente)))
+	// fmt.Printf("%s\n", consulta)
 }
 
 func CargarComercio(db *bolt.DB, nrocomercio int, nombre string, domicilio string, codigopostal string, telefono string) {
@@ -98,6 +104,9 @@ func CargarComercio(db *bolt.DB, nrocomercio int, nombre string, domicilio strin
 	}
 
 	CreateUpdate(db, "Comercio", []byte(strconv.Itoa(comercio.Nrocomercio)), data)
+
+	// consulta, err := ReadUnique(db, "Comercio", []byte(strconv.Itoa(comercio.Nrocomercio)))
+	// fmt.Printf("%s\n", consulta)
 }
 
 func CargarCompra(db *bolt.DB, nrooperacion int, nrotarjeta string, nrocomercio int, fecha string, monto int, pagado bool) {
@@ -109,6 +118,9 @@ func CargarCompra(db *bolt.DB, nrooperacion int, nrotarjeta string, nrocomercio 
 	}
 
 	CreateUpdate(db, "Compra", []byte(strconv.Itoa(compra.Nrooperacion)), data)
+
+	// consulta, err := ReadUnique(db, "Compra", []byte(strconv.Itoa(compra.Nrooperacion)))
+	// fmt.Printf("%s\n", consulta)
 }
 
 func CreateUpdate(db *bolt.DB, bucketName string, key []byte, value []byte) error {
