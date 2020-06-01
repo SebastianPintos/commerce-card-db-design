@@ -91,6 +91,12 @@ en una base de datos NoSQL basada en JSON. Para ello, utilizar la base de datos 
 Este código, también deberá ejecutarse desde una aplicación CLI escrita en Go.
 
 == Descripción
+El programa se organiza en dos carpetas:
+- Carpeta sql:
+* Contiene toda la lógica asociada a los ítems: Creación de la base de datos, Instancia de los datos y Stored procedures o triggers. 
+- Carpeta no-sql:
+* Contiene la resolución del ítem JSON y Base de datos NoSQL.
+A continuación se detallará brevemente el funcionamiento de los métodos desarrollados.
 
 En esta sección pueden incluirse las dificultades que tuvieron, las
 soluciones encontradas, las decisiones que se fueron tomando a lo largo
