@@ -15,20 +15,26 @@ Por último, no olvidar utilizar signos de puntuación y checkear la
 ortografía.
 
 == Introducción
+
 === Creación de la Base de Datos 
+
 Se deberán crear las tablas respetando los nombres de tablas, atributos y tipos de datos
 especificados.
 Se deberán agregar las PK’s y FK’s de todas las tablas, por separado de la creación de las
 tablas. Además, el usuario deberá tener la posibilidad de borrar todas las PK’s y FK’s, si
 lo desea.
+
 === Instancia de los datos
+
 Se deberán cargar 20 clientes y 20 comercios. Todos los clientes tendrán una tarjeta,
 excepto dos clientes que tendrán dos tarjetas cada uno. Una tarjeta deberá estar expirada
 en su fecha de vencimiento.
 La tabla cierre deberá tener los cierres de las tarjetas para todo el año 2020.
+
 === Stored procedures o triggers
+
 El trabajo práctico deberá incluir los siguientes stored procedures ó triggers:
-* Autorización de compra:  se deberá incluir la lógica que reciba los datos de una
+* Autorización de compra: se deberá incluir la lógica que reciba los datos de una
 compra—número de tarjeta, código de seguridad, número de comercio y monto y
 que devuelva true si se autoriza la compra ó false si se rechaza. El procedimiento
 deberá validar los siguientes elementos antes de autorizar:
@@ -72,7 +78,9 @@ contener los atributos: nrotarjeta, codseguridad, nrocomercio, monto. Y se deber
 hacer un procedimiento de testeo, que pida autorización para todos los consumos virtuales.
 *Todo el código SQL escrito para este trabajo práctico, deberá poder ejecutarse
 desde una aplicación CLI escrita en Go.
+
 === JSON y Base de datos NoSQL
+
 Por úlimo, para poder comparar el modelo relacional con un modelo no relacional NoSQL,
 se pide guardar los datos de clientes, tarjetas, comercios, y compras (tres por cada entidad)
 en una base de datos NoSQL basada en JSON. Para ello, utilizar la base de datos BoltDB.
