@@ -35,7 +35,7 @@ La tabla cierre deberá tener los cierres de las tarjetas para todo el año 2020
 
 El trabajo práctico deberá incluir los siguientes stored procedures ó triggers:
 
--Autorización de compra: Deberá recibir los datos de una compra número de tarjeta, código de seguridad, número de comercio y monto y que devuelva true si se autoriza la compra ó false si se rechaza. El procedimiento
+- Autorización de compra: Deberá recibir los datos de una compra número de tarjeta, código de seguridad, número de comercio y monto y que devuelva true si se autoriza la compra ó false si se rechaza. El procedimiento
 deberá validar los siguientes elementos antes de autorizar:
 
 * Que el número de tarjeta sea existente, y que corresponda a alguna tarjeta vigente.
