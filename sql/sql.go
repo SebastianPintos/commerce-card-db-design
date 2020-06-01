@@ -282,7 +282,7 @@ func CargarDatos() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_generarCierres()	
+	_generarCierres()
 }
 
 func _generarCierres() {
@@ -426,14 +426,14 @@ func autorizarCompra() {
 	}
 }
 
-func GenerarLogicaConsumo(){
+func GenerarLogicaConsumo() {
 	autorizarCompra()
 	crearTriggerRechazo()
 	crearTriggerConsumo()
-	generarConsumo()	
+	generarConsumo()
 }
 
-func generarConsumo(){
+func generarConsumo() {
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
@@ -464,8 +464,8 @@ func generarConsumo(){
 	}
 }
 
-func crearTriggerConsumo(){
-	agregarTestConsumo();
+func crearTriggerConsumo() {
+	agregarTestConsumo()
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
@@ -552,8 +552,8 @@ func agregarAlertaRechazo() {
 	}
 }
 
-func crearTriggerRechazo(){
-	agregarAlertaRechazo();
+func crearTriggerRechazo() {
+	agregarAlertaRechazo()
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
@@ -569,6 +569,71 @@ func crearTriggerRechazo(){
 		
 		`)
 
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+func CrearTriggersSeguridad() {
+	seguridadCompras()
+	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	_, err = db.Query(
+		`create trigger compras_lapso_tiempo
+		before insert on compra
+	
+		for each row
+			execute procedure compras_lapso_tiempo();
+		`)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+func seguridadCompras() {
+	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	_, err = db.Query(
+		`create or replace function compras_lapso_tiempo() returns trigger as $$
+		declare
+			ultimaCompra record;
+			difTimestamps decimal;
+			codPostalAnterior int;
+			codPostalActual int;
+		begin
+			select * into ultimaCompra from compra where nrotarjeta = new.nrotarjeta order by nrooperacion desc limit 1;
+
+			if(not found) then
+				raise notice 'No hay compra anterior';
+				return new;
+			end if;
+
+			select into difTimestamps extract(epoch from new.fecha - ultimaCompra.fecha) / 60;
+
+			select codigopostal into codPostalAnterior from comercio where nrocomercio = ultimaCompra.nrocomercio;
+			select codigopostal into codPostalActual from comercio where nrocomercio = new.nrocomercio;
+			
+			if(difTimestamps < 1 and ultimaCompra.nrocomercio != new.nrocomercio and codPostalAnterior = codPostalActual) then
+				raise notice 'Alerta compra en menos de 1 minuto en una misma zona';
+				return new;
+			end if;
+
+			if(difTimestamps < 5 and ultimaCompra.nrocomercio != new.nrocomercio and codPostalAnterior != codPostalActual) then
+				raise notice 'Alerta compra en menos de 5 minutos en diferentes zonas';
+				return new;
+			end if;
+
+			return new;
+			end;
+		$$ language plpgsql;
+	`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -641,6 +706,3 @@ func GenerarResumen() {
 		log.Fatal(err)
 	}
 }
-
-
-
