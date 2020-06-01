@@ -91,12 +91,21 @@ en una base de datos NoSQL basada en JSON. Para ello, utilizar la base de datos 
 Este código, también deberá ejecutarse desde una aplicación CLI escrita en Go.
 
 == Descripción
-El programa se organiza en dos carpetas:
+El programa se organiza en dos carpetas y un archivo escrito en Go que sirve como aplicación CLI:
 - Carpeta sql:
 * Contiene toda la lógica asociada a los ítems: Creación de la base de datos, Instancia de los datos y Stored procedures o triggers. 
-- Carpeta no-sql:
-* Contiene la resolución del ítem JSON y Base de datos NoSQL.
 A continuación se detallará brevemente el funcionamiento de los métodos desarrollados.
+* CrearDB(): Creación de la Base de Datos.
+* CrearTablas(): Creación de las tablas especificadas.
+* CrearPKyFK(): Utiliza los métodos crearPK() y crearFK() respectivamente.
+* EliminarPKyFK(): Utiliza los métodos eliminarPK() y eliminarFK() respectivamente.
+* CargarDatos(): Carga la cantidad de datos especificada en las tablas: cliente y comercio. Genera los cierres para el año 2020, llamando a _generarCierres().
+* generarCierres(): Crea una stored procedure que toma como parámetro el año y genera los cierres para ese año, para cada terminación posible.
+* _generarCierres(): Invoca a la función anterior para generar los cierres del 2020.
+* autorizarCompra(): Crea una stored procedure con parámetros: nrotarjeta, codseguridad, nrocomercio, y monto. Devuelve true si la compra fue autorizada y false si fue rechazada.
+* 
+- Carpeta no-sql: 
+* Contiene la resolución del ítem JSON y Base de datos NoSQL.
 
 En esta sección pueden incluirse las dificultades que tuvieron, las
 soluciones encontradas, las decisiones que se fueron tomando a lo largo
