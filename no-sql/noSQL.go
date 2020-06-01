@@ -5,7 +5,7 @@ import (
 	"log"
 	"strconv"
 
-	bolt "github.com./coreos/bbolt"
+	bolt "go.etcd.io/bbolt"
 )
 
 type Cliente struct {
@@ -44,7 +44,7 @@ type Compra struct {
 }
 
 func CargaDatosNoDB() {
-	db, err := bolt.Open("./boltDB/test.db", 0600, nil)
+	db, err := bolt.Open("./no-sql/boltDB/test.db", 0600, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
