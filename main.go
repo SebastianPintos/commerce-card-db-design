@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	noSQL "./no-sql"
 	"./sql"
 )
 
@@ -56,8 +57,8 @@ func manejarOpciones(opcion int) bool {
 		//	sql.CrearTriggerRechazo();
 		fmt.Println("Se agregó lógica de alertas")
 	case opcion == 8:
-		no - sql.CargaDatosNoDB()
-		fmt.Println("Se agregó lógica de alertas")
+		noSQL.CargaDatosNoDB()
+		fmt.Println("Todos los datos noSQL DB cargados")
 	case opcion == 9:
 		return false
 	default:
