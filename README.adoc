@@ -39,25 +39,25 @@ El trabajo práctico deberá incluir los siguientes stored procedures ó trigger
 deberá validar los siguientes elementos antes de autorizar:
 
 * Que el número de tarjeta sea existente, y que corresponda a alguna tarjeta vigente.
-En caso de que no cumpla, se debe cargar un rechazo con el mensaje ?tarjeta no
+En caso de que no cumpla, se debe cargar un rechazo con el mensaje: tarjeta no
 válida ó no vigente.
 
 * Que el código de seguridad sea el correcto. En caso de que no cumpla, se debe
-cargar un rechazo con el mensaje ?código de seguridad inválido.
+cargar un rechazo con el mensaje: código de seguridad inválido.
 
 * Que el monto total de compras pendientes de pago más la compra a realizar no
 supere el límite de compra de la tarjeta. En caso de que no cumpla, se debe cargar
-un rechazo con el mensaje ?supera límite de tarjeta.
+un rechazo con el mensaje: supera límite de tarjeta.
 
 * Que la tarjeta no se encuentre vencida. En caso de que no cumpla, se debe cargar
-un rechazo con el mensaje ?plazo de vigencia expirado.
+un rechazo con el mensaje: plazo de vigencia expirado.
 
 * Que la tarjeta no se encuentre suspendida. En caso que no cumpla, se debe cargar
 un rechazo con el mensaje la tarjeta se encuentra suspendida.
 Si se aprueba la compra, se deberá guardar una fila en la tabla compra, con los datos
 de la compra.
 
-* Generación del resumen el trabajo práctico deberá contener la lógica que reciba
+- Generación del resumen el trabajo práctico deberá contener la lógica que reciba
 como parámetros el número de cliente, y el periodo del año, y que guarde en las
 tablas que corresponda los datos del resumen con la siguiente información: nombre
 y apellido, dirección, número de tarjeta, periodo del resumen, fecha de vencimiento,
@@ -65,10 +65,9 @@ todas las compras del periodo, y total a pagar.
 
 - Alertas a clientes: Se deberá proveer la lógica que genere alertas por posibles fraudes. 
 Existe un Call Centre que ante cada alerta generada automáticamente, realiza un llamado telefónico
-a le cliente, indicándole la alerta detectada, y verifica si se trató de un fraude ó no. 
+a el cliente, indicándole la alerta detectada, y verifica si se trató de un fraude ó no. 
 Se supone que la detección de alertas se ejecuta
-automáticamente con cierta frecuencia—e.g. de una vez por minuto. Se pide detectar
-y almacenar las siguientes alertas:
+automáticamente con cierta frecuencia. Se pide detectar y almacenar las siguientes alertas:
 * Todo rechazo se debe ingresar automáticamente a la tabla de alertas. No puede
 haber ninguna demora para ingresar un rechazo en la tabla de alertas, se debe
 ingresar en el mismo instante en que se generó el rechazo.
@@ -79,16 +78,15 @@ con diferentes códigos postales.
 * Si una tarjeta registra dos rechazos por exceso de límite en el mismo día, la tarjeta
 tiene que ser suspendida preventivamente, y se debe grabar una alerta asociada a
 este cambio de estado.
-Se deberá crear una tabla con consumos virtuales para probar el sistema, la misma deberá
+- Se deberá crear una tabla con consumos virtuales para probar el sistema, la misma deberá
 contener los atributos: nrotarjeta, codseguridad, nrocomercio, monto. Y se deberá
 hacer un procedimiento de testeo, que pida autorización para todos los consumos virtuales.
-* Todo el código SQL escrito para este trabajo práctico, deberá poder ejecutarse
+- Todo el código SQL escrito para este trabajo práctico, deberá poder ejecutarse
 desde una aplicación CLI escrita en Go.
 
 === JSON y Base de datos NoSQL
 
-Por úlimo, para poder comparar el modelo relacional con un modelo no relacional NoSQL,
-se pide guardar los datos de clientes, tarjetas, comercios, y compras (tres por cada entidad)
+Se deberá guardar los datos de clientes, tarjetas, comercios, y compras (tres por cada entidad)
 en una base de datos NoSQL basada en JSON. Para ello, utilizar la base de datos BoltDB.
 Este código, también deberá ejecutarse desde una aplicación CLI escrita en Go.
 
