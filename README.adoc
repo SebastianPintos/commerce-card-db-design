@@ -105,13 +105,13 @@ El programa se organiza en dos carpetas y un archivo escrito en Go que sirve com
 * generarCierres(): Crea una stored procedure que toma como parámetro el año y genera los cierres para ese año, para cada terminación posible.
 * _generarCierres(): Invoca a la función anterior para generar los cierres del 2020.
 * autorizarCompra(): Crea una stored procedure con parámetros: nrotarjeta, codseguridad, nrocomercio, y monto. Devuelve true si la compra fue autorizada y false si fue rechazada.
-* generarConsumo(): 
-* crearTriggerConsumo():
-* agregarTestConsumo():
-* GenerarLogicaConsumo():
-* agregarRechazo():
-* agregarAlertaRechazo():
-* crearTriggerRechazo():
+* generarConsumo(): Crea una stored procedure con parámetro: cantidad. Genera la cantidad de consumos especificada, obteniendo los datos aleatoriamente de las tablas comercio y tarjeta y creando un monto aleatorio.
+* crearTriggerConsumo(): Llama a la función agregarTestConsumo para crear la función testear_consumo. Crea un trigger que se activa antes de cada insert en la tabla consumo. Por cada fila insertada, ejecuta la función testear_consumo().
+* agregarTestConsumo(): Crea una stored procedura testear_consumo que llama a la función autorizar compra con sus respectivos parámetros, con los valores new generados en el insert.
+* GenerarLogicaConsumo():Llama a las funciones: autorizarCompra, crearTriggerRechazo, crearTriggerConsumo, generarConsumo. Para generar las stored procedures y triggers relacionados a los consumos virtuales y su testeo. 
+* agregarRechazo(): Crea una stored procedure que toma como parámetros: nrotarjeta, nrocomercio, fecha y motivo e inserta esos valores en la tabla rechazo.  
+* crearTriggerRechazo(): Crea un trigger que antes de cada insert en rechazo, por cada fila insertada llama a la función agregar_alerta.
+* agregarAlertaRechazo(): Crea una stored procedure agregar_alerta que agrega una alerta con los valores a insertar en la tabla rechazo. Con codalerta: 0. Correspondiente a alertas generadas por rechazo.
 * GenerarResumen(): 
 - Carpeta no-sql: 
 * Contiene la resolución del ítem JSON y Base de datos NoSQL.
