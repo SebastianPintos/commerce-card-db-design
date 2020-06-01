@@ -5,7 +5,7 @@ import (
 	"log"
 	"strconv"
 
-	bolt "go.etcd.io/bbolt"
+	bolt "github.com/coreos/bbolt"
 )
 
 type Cliente struct {
