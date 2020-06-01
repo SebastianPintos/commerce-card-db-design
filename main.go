@@ -28,12 +28,13 @@ func mostrarMenu() {
 	fmt.Println("5) Cargar todos los datos")
 	fmt.Println("6) Agregar lógica de consumo virtual")
 	fmt.Println("7) Agregar lógica de alertas")
-	fmt.Println("8) Salir ")
+	fmt.Println("8) Cargar Datos noSql en BoltDB")
+	fmt.Println("9) Salir ")
 }
 func manejarOpciones(opcion int) bool {
 	switch {
 	case opcion == 1:
-		
+
 		sql.CrearDB()
 		fmt.Println("Base de datos creada")
 	case opcion == 2:
@@ -50,11 +51,14 @@ func manejarOpciones(opcion int) bool {
 		fmt.Println("Todos los datos cargados")
 	case opcion == 6:
 		sql.GenerarLogicaConsumo()
-		fmt.Println("Función creada")		
+		fmt.Println("Función creada")
 	case opcion == 7:
-	//	sql.CrearTriggerRechazo();
+		//	sql.CrearTriggerRechazo();
 		fmt.Println("Se agregó lógica de alertas")
 	case opcion == 8:
+		no - sql.CargaDatosNoDB()
+		fmt.Println("Se agregó lógica de alertas")
+	case opcion == 9:
 		return false
 	default:
 		fmt.Println("Ingrese un numero valido")
