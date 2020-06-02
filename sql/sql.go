@@ -298,7 +298,7 @@ func autorizarCompra() {
 	_, err = db.Query(
 		`create or replace function autorizarcompra(_nrotarjeta char(16),_codseguridad char(4),_nrocomercio int, _monto decimal(7,2)) returns bool as $$
 		 declare
-			totalpendiente decimal(7,2);
+			totalpendiente decimal(8,2);
 			montomaximo decimal(8,2);
 			fechaVenceTarjeta int;
 			fechaVence date;
@@ -354,15 +354,13 @@ func autorizarCompra() {
 
 func GenerarLogicaConsumo() {
 	autorizarCompra()
-//	crearTriggerRechazo()
-	crearTriggerConsumo()
-	generarConsumo()
+	generarConsumo()	
+	crearTriggerConsumo()	
 }
 
 func GenerarLogicaAlertas(){
 	crearTriggerRechazo()
 	crearTriggersSeguridad()
-//	chequearRechazoLimites()
 }
 
 func generarConsumo() {
@@ -376,7 +374,8 @@ func generarConsumo() {
 		begin
 
 		for _consumo in 0..cantidad-1 loop
-			select into montoAleatorio ((random() * (80000 - 100)) + 100) as aleatorio;
+			montoAleatorio = 999 + random()*99000;
+			perform trunc(montoAleatorio,2);
 			select into comercioAleatorio nrocomercio from comercio order by random() limit 1;
 			select into tarjetaAleatoria * from tarjeta order by random() limit 1;
 			insert into consumo values(tarjetaAleatoria.nrotarjeta, tarjetaAleatoria.codseguridad, comercioAleatorio, cast(montoAleatorio as decimal(7,2)));
@@ -405,8 +404,8 @@ func agregarTestConsumo() {
 	_, err = db.Query(
 		`create or replace function testear_consumo() returns trigger as $$
 		begin
-
-		perform autorizarcompra(new.nrotarjeta,new.codseguridad, new.nrocomercio,new.monto);
+		
+		perform autorizarcompra(new.nrotarjeta,new.codseguridad, new.nrocomercio, new.monto);
 		return new;
 		end;
 
