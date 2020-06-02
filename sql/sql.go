@@ -7,34 +7,37 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func CrearDB() {
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=postgres sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
+var db *sql.DB
+var err error
 
-	_, err = db.Exec(`create database test`)
+func DbConnection() {
+	db, err = sql.Open("postgres", "user=postgres host=localhost dbname=test2 sslmode=disable")
+	logErr(err)
+}
+
+func logErr(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func CrearTablas() {
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
+func CrearDB() {
+	_db, _err := sql.Open("postgres", "user=postgres host=localhost dbname=postgres sslmode=disable")
+	logErr(_err)
 
+	defer _db.Close()
+
+	_, _err = _db.Exec(`create database test2`)
+	logErr(_err)
+}
+
+func CrearTablas() {
 	_, err = db.Exec(`DROP SCHEMA public CASCADE`)
-	if err != nil {
-		log.Fatal(err)
-	}
+	logErr(_err)
+
 	_, err = db.Exec(`CREATE SCHEMA public`)
-	if err != nil {
-		log.Fatal(err)
-	}
+	logErr(_err)
+
 	_, err = db.Exec(`create table cliente (nrocliente int,
 											nombre text,
 											apellido text,
@@ -100,9 +103,7 @@ func CrearTablas() {
 											nrocomercio int,
 											monto decimal(7,2)
 											)`)
-	if err != nil {
-		log.Fatal(err)
-	}
+	logErr(_err)
 }
 
 func CrearPKyFK() {
@@ -116,12 +117,6 @@ func EliminarPKyFK() {
 }
 
 func crearPK() {
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
 	_, err = db.Exec(`alter table cliente add constraint cliente_pk primary key (nrocliente);
 					  alter table tarjeta add constraint tarjeta_pk primary key (nrotarjeta);
 					  alter table comercio add constraint comercio_pk primary key (nrocomercio);
@@ -130,20 +125,11 @@ func crearPK() {
 	                  alter table cierre add constraint cierre_pk primary key (año, mes, terminacion);
 	                  alter table cabecera add constraint cabecera_pk primary key (nroresumen);
 	                  alter table detalle add constraint detalle_pk primary key (nroresumen, nrolinea);
-	                  alter table alerta add constraint alerta_pk primary key (nroalerta);`)
-
-	if err != nil {
-		log.Fatal(err)
-	}
+					  alter table alerta add constraint alerta_pk primary key (nroalerta);`)
+	logErr(err)
 }
 
 func crearFK() {
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
 	_, err = db.Exec(`alter table tarjeta add constraint tarjeta_nrocliente_fk foreign key (nrocliente) references cliente(nrocliente);
 					  alter table compra add constraint compra_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
 					  alter table compra add constraint compra_nrocomercio_fk foreign key (nrocomercio) references comercio(nrocomercio);
@@ -153,20 +139,10 @@ func crearFK() {
 					  alter table detalle add constraint detalle_cabecera_fk foreign key (nroresumen) references cabecera(nroresumen);
 					  alter table alerta add constraint alerta_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
 					`)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	logErr(err)
 }
 
 func eliminarPK() {
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
 	_, err = db.Exec(`alter table cliente drop constraint cliente_pk;
 					  alter table tarjeta drop constraint tarjeta_pk;
 					  alter table comercio drop constraint comercio_pk;
@@ -177,41 +153,22 @@ func eliminarPK() {
 	                  alter table detalle drop constraint detalle_pk;
 	                  alter table alerta drop constraint alerta_pk;
 	                `)
-
-	if err != nil {
-		log.Fatal(err)
-	}
+	logErr(err)
 }
 
 func eliminarFK() {
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
 	_, err = db.Exec(`alter table tarjeta drop constraint tarjeta_nrocliente_fk;
 					  alter table compra drop constraint compra_nrotarjeta_fk;
 					  alter table compra drop constraint compra_nrocomercio_fk;
 					  alter table rechazo drop constraint rechazo_nrotarjeta_fk;
 					  alter table rechazo drop constraint rechazo_nrocomercio_fk;
 					  alter table cabecera drop constraint cabecera_nrotarjeta_fk;
-					  alter table detalle drop constraint detalle_cabecera_fk; 
+					  alter table detalle drop constraint detalle_cabecera_fk;
 					  alter table alerta drop constraint alerta_nrotarjeta_fk;`)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	logErr(err)
 }
 
 func CargarDatos() {
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
 	_, err = db.Exec(`insert into cliente values(11348773,'Rocío', 'Losada','Av. Presidente Perón 1530',1151102983);
 					  insert into cliente values(12349972,'María Estela', 'Martínez','Belgrano 1830',1150006655);
 					  insert into cliente values(22648991,'Laura', 'Santos','Italia 220',1153399452);
@@ -232,7 +189,7 @@ func CargarDatos() {
 					  insert into cliente values(18397552,'Pedro', 'Tomarello','Av. San Martín 1511',110887547);
 					  insert into cliente values(13348765,'José', 'Mengarelli','Guido Spano 244',110044332);
 					  insert into cliente values(14348789,'Ricardo', 'Llanos','Corrientes 183',119034572);
-					  
+
 					  insert into comercio values(501,'Kevingston', 'Av. Tte. Gral. Ricchieri 965', 1661 ,46666181);
 					  insert into comercio values(523,'47 street', 'Paunero 1575', 1663 ,47597581);
 					  insert into comercio values(513,'Garbarino', 'Av. Bartolomé Mitre 1198', 1661 ,08104440018);
@@ -253,7 +210,7 @@ func CargarDatos() {
 					  insert into comercio values(596,'Umma', 'Paunero 1476', 1663 ,44519267);
 					  insert into comercio values(538,'COTO', 'Ohiggins 1280', 1661 ,46682636);
 					  insert into comercio values(553,'Disco', 'Av. Senador Morón 960', 1661 ,08107778888);
-					  
+
 					  insert into tarjeta values(4000001234567899,11348773, 201508, 202008, 733 ,50000,'vigente');
 					  insert into tarjeta values(4037001554363655,12349972, 201507, 202007, 332 ,55000,'vigente');
 					  insert into tarjeta values(4000001355435322,22648991, 201507, 202007, 201 ,60000,'vigente');
@@ -276,39 +233,22 @@ func CargarDatos() {
 					  insert into tarjeta values(4000632234361811,13348765, 201709, 202209, 195 ,53000,'suspendida');
 					  insert into tarjeta values(4000000203465800,14348789, 201808, 202308, 290 ,78000,'anulada');
 					  insert into tarjeta values(4003300224374894,14348789, 201809, 202309, 284 ,84000,'anulada');
-					  
-					  `)
 
-	if err != nil {
-		log.Fatal(err)
-	}
+					  `)
+	logErr(err)
+
 	_generarCierres()
 }
 
 func _generarCierres() {
 	generarCierres()
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
 
 	_, err = db.Query(
 		`select generarCierres(2020);`)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	logErr(err)
 }
 
 func generarCierres() {
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
 	_, err = db.Query(
 		`
 		create or replace function generarCierres(año int)returns void as $$
@@ -339,29 +279,21 @@ func generarCierres() {
 					fechafin=concat(cast(año as text),cast(_mes as text),'01');
 					fechavto=concat(cast(año as text),'0',cast(_mes as text),'15');
 				end if;
-				
+
 				insert into cierre values(año, mes, terminacion, to_date(fechainicio,'YYYYMMDD'), to_date(fechafin,'YYYYMMDD'), to_date(fechavto,'YYYYMMDD'));
-		
+
 			end loop;
 		end loop;
-	
+
 		end;
-		
+
 		$$ language plpgsql;`)
 
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	logErr(err)
 }
 
 func autorizarCompra() {
 	agregarRechazo()
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
 
 	_, err = db.Query(
 		`create or replace function autorizarcompra(_nrotarjeta char(16),_codseguridad char(4),_nrocomercio int, _monto decimal(7,2)) returns bool as $$
@@ -370,11 +302,11 @@ func autorizarCompra() {
 			montomaximo decimal(8,2);
 			fechaVenceTarjeta int;
 			fechaVence date;
-			
+
 		 begin
-		
+
 			perform * from tarjeta where nrotarjeta=_nrotarjeta and estado='suspendida';
-		
+
 			if (found) then
 				perform agregarrechazo(cast(_nrotarjeta as char(16)),cast(_nrocomercio as int),cast(current_timestamp as timestamp),cast(_monto as decimal(7,2)),cast('La tarjeta se encuentra suspendida' as text));
 				return False;
@@ -396,7 +328,7 @@ func autorizarCompra() {
 
 			totalpendiente:= (select sum(monto) from compra where nrotarjeta =_nrotarjeta and pagado=False);
 			montomaximo:= (select limitecompra from tarjeta where nrotarjeta=_nrotarjeta);
-	
+
 			if(totalpendiente is null and _monto > montomaximo or totalpendiente is not null and totalpendiente + _monto>montomaximo) then
 				perform agregarrechazo(cast(_nrotarjeta as char(16)),cast(_nrocomercio as int),cast(current_timestamp as timestamp),cast(_monto as decimal(7,2)),cast('Supera límite de tarjeta' as text));
 				return False;
@@ -414,16 +346,10 @@ func autorizarCompra() {
 
 			insert into compra(nrotarjeta, nrocomercio, fecha, monto, pagado) values( _nrotarjeta, _nrocomercio, current_timestamp, _monto,False);
 			return True;
-		
 
-
-		
 		end;
 	$$ language plpgsql;`)
-
-	if err != nil {
-		log.Fatal(err)
-	}
+	logErr(err)
 }
 
 func GenerarLogicaConsumo() {
@@ -434,12 +360,6 @@ func GenerarLogicaConsumo() {
 }
 
 func generarConsumo() {
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
 	_, err = db.Query(
 		`
 		create or replace function generarConsumo(cantidad int)returns void as $$
@@ -456,43 +376,26 @@ func generarConsumo() {
 			insert into consumo values(tarjetaAleatoria.nrotarjeta, tarjetaAleatoria.codseguridad, comercioAleatorio, montoAleatorio);
 		end loop;
 		end;
-		
-		$$ language plpgsql;`)
 
-	if err != nil {
-		log.Fatal(err)
-	}
+		$$ language plpgsql;`)
+	logErr(err)
 }
 
 func crearTriggerConsumo() {
 	agregarTestConsumo()
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
 
 	_, err = db.Query(
 		`create trigger agregarconsumo_trg
 		before insert on consumo
-	
+
 		for each row
 			execute procedure testear_consumo();
-		
-		`)
 
-	if err != nil {
-		log.Fatal(err)
-	}
+		`)
+	logErr(err)
 }
 
 func agregarTestConsumo() {
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
 	_, err = db.Query(
 		`create or replace function testear_consumo() returns trigger as $$
 		begin
@@ -500,115 +403,71 @@ func agregarTestConsumo() {
 		perform autorizarcompra(new.nrotarjeta,new.codseguridad, new.nrocomercio,new.monto);
 		return new;
 		end;
-		
-	$$ language plpgsql;`)
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	$$ language plpgsql;`)
+	logErr(err)
 }
 
 func agregarRechazo() {
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
 	_, err = db.Query(
 		`create or replace function agregarrechazo(_nrotarjeta char(16),_nrocomercio int, _fecha timestamp,_monto decimal(7,2),_motivo text) returns void as $$
 		declare
 			numerorechazo int;
 
 		begin
-		
+
 		insert into rechazo(nrotarjeta, nrocomercio, fecha, monto, motivo) values( _nrotarjeta, _nrocomercio, current_timestamp, _monto, _motivo)
 		RETURNING nrorechazo INTO numerorechazo;
 
-		// mover insert rechazo
-		ChequearRechazoLimites(numerorechazo);
-		
-		end;
-		
-	$$ language plpgsql;`)
+		--mover insert rechazo
+		select ChequearRechazoLimites(numerorechazo);
 
-	if err != nil {
-		log.Fatal(err)
-	}
+		end;
+
+	$$ language plpgsql;`)
+	logErr(err)
 }
 
 func agregarAlertaRechazo() {
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
 	_, err = db.Query(
 		`create or replace function agregar_alerta() returns trigger as $$
 		begin
 
 		insert into alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion) values(new.nrotarjeta, new.fecha, new.nrorechazo, 0, new.motivo);
-		
+
 		return new;
 		end;
-		
-	$$ language plpgsql;`)
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	$$ language plpgsql;`)
+	logErr(err)
 }
 
 func crearTriggerRechazo() {
 	agregarAlertaRechazo()
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
 
 	_, err = db.Query(
 		`create trigger agregarrechazo_trg
 		before insert on rechazo
-	
+
 		for each row
 			execute procedure agregar_alerta();
-		
-		`)
 
-	if err != nil {
-		log.Fatal(err)
-	}
+		`)
+	logErr(err)
 }
 func CrearTriggersSeguridad() {
 	seguridadCompras()
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
 	_, err = db.Query(
 		`create trigger compras_lapso_tiempo
 		before insert on compra
-	
+
 		for each row
 			execute procedure compras_lapso_tiempo();
 		`)
-
-	if err != nil {
-		log.Fatal(err)
-	}
+	logErr(err)
 }
 
 func seguridadCompras() {
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
 	_, err = db.Query(
 		`create or replace function compras_lapso_tiempo() returns trigger as $$
 		declare
@@ -628,7 +487,7 @@ func seguridadCompras() {
 
 			select codigopostal into codPostalAnterior from comercio where nrocomercio = ultimaCompra.nrocomercio;
 			select codigopostal into codPostalActual from comercio where nrocomercio = new.nrocomercio;
-			
+
 			if(difTimestamps < 1 and ultimaCompra.nrocomercio != new.nrocomercio and codPostalAnterior = codPostalActual) then
 				raise notice 'Alerta compra en menos de 1 minuto en una misma zona';
 				return new;
@@ -643,27 +502,19 @@ func seguridadCompras() {
 			end;
 		$$ language plpgsql;
 	`)
-	if err != nil {
-		log.Fatal(err)
-	}
+	logErr(err)
 }
 
 func GenerarResumen() {
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
 	_, err = db.Query(
 		`create or replace function generarResumen(cliente int, anioR int, mesR int) returns bool as $$
 		declare
 			   idResumen int;
 			   totalPagar decimal(7,2) := 0;
-		   
-				begin		
+
+				begin
 		-- 	Generar Cabecera
-				INSERT INTO cabecera (nombre, apellido, domicilio, nrotarjeta, desde, hasta, vence) 
+				INSERT INTO cabecera (nombre, apellido, domicilio, nrotarjeta, desde, hasta, vence)
 				SELECT cli.nombre, cli.apellido, cli.domicilio, t.nrotarjeta, c.fechainicio, c.fechacierre, c.fechavto
 					FROM public.tarjeta t, public.cierre c, public.cliente cli
 					WHERE SUBSTRING (t.nrotarjeta, LENGTH(t.nrotarjeta), 1)::int = c.terminacion
@@ -672,14 +523,14 @@ func GenerarResumen() {
 					and c.año = anioR
 					and c.mes = mesR
 				RETURNING nroresumen INTO idResumen;
-				
+
 				if (idResumen is null) then
 					raise 'No se pudo generar el resumen, Cliente inexistente';
 					return False;
-				end if;	
-		
-		-- Generar detalle	
-				INSERT INTO detalle (nroresumen, nrolinea, fecha, nombrecomercio, monto) 
+				end if;
+
+		-- Generar detalle
+				INSERT INTO detalle (nroresumen, nrolinea, fecha, nombrecomercio, monto)
 				SELECT idResumen, ROW_NUMBER () OVER (ORDER BY t.nrotarjeta) as nrolinea, co.fecha, com.nombre , co.monto
 				FROM public.tarjeta t, public.cierre c, public.compra co, public.comercio com
 				WHERE SUBSTRING (t.nrotarjeta, LENGTH(t.nrotarjeta), 1)::int = c.terminacion
@@ -688,71 +539,59 @@ func GenerarResumen() {
 				and t.nrocliente = cliente
 				and c.año = anioR
 				and c.mes = mesR
-				and co.fecha >= c.fechainicio 
-				and co.fecha <= c.fechacierre;	
-				
+				and co.fecha >= c.fechainicio
+				and co.fecha <= c.fechacierre;
+
 				if (lastval() is NULL) then
 					raise 'No se pudo generar el resumen';
 					return False;
-				end if;	
-			
+				end if;
+
 		-- Actualizar Resumen
-				totalPagar := (SELECT SUM(monto) 
-							  FROM detalle 
+				totalPagar := (SELECT SUM(monto)
+							  FROM detalle
 							  WHERE nroresumen = idResumen
 							  GROUP BY nroresumen);
-				UPDATE cabecera 
+				UPDATE cabecera
 				set total = totalPagar
-				WHERE nroresumen = idResumen;	
-				
+				WHERE nroresumen = idResumen;
+
 				return True;
-				
+
 				   end;
 		$$ language plpgsql;`)
-
-	if err != nil {
-		log.Fatal(err)
-	}
+	logErr(err)
 }
 
 func ChequearRechazoLimites() {
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
 	_, err = db.Query(
 		`create or replace function ChequearRechazoLimites(numeroR int) returns void as $$
 		Declare
 			tarjetaR char(16);
 			fechaR timestamp;
 		begin
-	
+
 			SELECT nrotarjeta, fecha INTO tarjetaR, fechaR FROM rechazo where nrorechazo = numeroR;
-	
-			perform nrotarjeta 
-			from rechazo 
+
+			perform nrotarjeta
+			from rechazo
 			where nrotarjeta = tarjetaR
 			and fecha = fechaR
 			and motivo = 'Supera límite de tarjeta'
 			group by nrotarjeta
 			having count(*) > 1;
-			
+
 			if (found) then
-				insert into alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion) 
+				insert into alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion)
 				values (tarjetaR, fechaR, numeroR, 23, 'tarjeta suspendida');
-				
-				update tarjeta 
+
+				update tarjeta
 				Set estado = 'suspendida'
 				where nroTarjeta = tarjetaR;
-			end if;	
-			
-		end;
-		$$ language plpgsql;`
-	)
+			end if;
 
-	if err != nil {
-		log.Fatal(err)
-	}
+		end;
+		$$ language plpgsql;
+		`)
+	logErr(err)
 }

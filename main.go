@@ -8,6 +8,9 @@ import (
 )
 
 func main() {
+
+	sql.DbConnection()
+
 	running := true
 	var opcion int
 
@@ -30,12 +33,12 @@ func mostrarMenu() {
 	fmt.Println("6) Agregar lógica de consumo virtual")
 	fmt.Println("7) Agregar lógica de alertas")
 	fmt.Println("8) Cargar Datos noSql en BoltDB")
-	fmt.Println("9) Salir ")
+	fmt.Println("9) Generar Resumenes")
+	fmt.Println("10) Salir ")
 }
 func manejarOpciones(opcion int) bool {
 	switch {
 	case opcion == 1:
-
 		sql.CrearDB()
 		fmt.Println("Base de datos creada")
 	case opcion == 2:
@@ -60,6 +63,9 @@ func manejarOpciones(opcion int) bool {
 		noSQL.CargaDatosNoDB()
 		fmt.Println("Todos los datos noSQL DB cargados")
 	case opcion == 9:
+		sql.GenerarResumen()
+		fmt.Println("Resumenes Generados")
+	case opcion == 10:
 		return false
 	default:
 		fmt.Println("Ingrese un numero valido")
