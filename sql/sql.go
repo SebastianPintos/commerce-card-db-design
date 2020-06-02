@@ -485,7 +485,6 @@ func seguridadCompras() {
 			select * into ultimaCompra from compra where nrotarjeta = new.nrotarjeta order by nrooperacion desc limit 1;
 
 			if(not found) then
-				--raise notice 'No hay compra anterior';
 				return new;
 			end if;
 
