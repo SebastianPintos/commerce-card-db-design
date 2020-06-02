@@ -16,10 +16,105 @@ ortografía.
 
 == Introducción
 
-Descripción del trabajo práctico. Aquí se puede copiar textual el [ó
-parte del] enunciado del trabajo práctico de considerarse necesario.
+=== Creación de la Base de Datos 
+
+Se deberán crear las tablas respetando los nombres de tablas, atributos y tipos de datos
+especificados.
+Se deberán agregar las PK’s y FK’s de todas las tablas, por separado de la creación de las
+tablas. Además, el usuario deberá tener la posibilidad de borrar todas las PK’s y FK’s, si
+lo desea.
+
+=== Instancia de los datos
+
+Se deberán cargar 20 clientes y 20 comercios. Todos los clientes tendrán una tarjeta,
+excepto dos clientes que tendrán dos tarjetas cada uno. Una tarjeta deberá estar expirada
+en su fecha de vencimiento.
+La tabla cierre deberá tener los cierres de las tarjetas para todo el año 2020.
+
+=== Stored procedures o triggers
+
+El trabajo práctico deberá incluir los siguientes stored procedures ó triggers:
+
+- Autorización de compra: Deberá recibir los datos de una compra número de tarjeta, código de seguridad, número de comercio y monto y que devuelva true si se autoriza la compra ó false si se rechaza. El procedimiento
+deberá validar los siguientes elementos antes de autorizar:
+
+* Que el número de tarjeta sea existente, y que corresponda a alguna tarjeta vigente.
+En caso de que no cumpla, se debe cargar un rechazo con el mensaje: tarjeta no
+válida ó no vigente.
+
+* Que el código de seguridad sea el correcto. En caso de que no cumpla, se debe
+cargar un rechazo con el mensaje: código de seguridad inválido.
+
+* Que el monto total de compras pendientes de pago más la compra a realizar no
+supere el límite de compra de la tarjeta. En caso de que no cumpla, se debe cargar
+un rechazo con el mensaje: supera límite de tarjeta.
+
+* Que la tarjeta no se encuentre vencida. En caso de que no cumpla, se debe cargar
+un rechazo con el mensaje: plazo de vigencia expirado.
+
+* Que la tarjeta no se encuentre suspendida. En caso que no cumpla, se debe cargar
+un rechazo con el mensaje la tarjeta se encuentra suspendida.
+Si se aprueba la compra, se deberá guardar una fila en la tabla compra, con los datos
+de la compra.
+
+- Generación del resumen el trabajo práctico deberá contener la lógica que reciba
+como parámetros el número de cliente, y el periodo del año, y que guarde en las
+tablas que corresponda los datos del resumen con la siguiente información: nombre
+y apellido, dirección, número de tarjeta, periodo del resumen, fecha de vencimiento,
+todas las compras del periodo, y total a pagar.
+
+- Alertas a clientes: Se deberá proveer la lógica que genere alertas por posibles fraudes. 
+Existe un Call Centre que ante cada alerta generada automáticamente, realiza un llamado telefónico
+a el cliente, indicándole la alerta detectada, y verifica si se trató de un fraude ó no. 
+Se supone que la detección de alertas se ejecuta
+automáticamente con cierta frecuencia. Se pide detectar y almacenar las siguientes alertas:
+* Todo rechazo se debe ingresar automáticamente a la tabla de alertas. No puede
+haber ninguna demora para ingresar un rechazo en la tabla de alertas, se debe
+ingresar en el mismo instante en que se generó el rechazo.
+* Si una tarjeta registra dos compras en un lapso menor de un minuto en comercios
+distintos ubicados en el mismo código postal.
+* Si una tarjeta registra dos compras en un lapso menor de 5 minutos en comercios
+con diferentes códigos postales.
+* Si una tarjeta registra dos rechazos por exceso de límite en el mismo día, la tarjeta
+tiene que ser suspendida preventivamente, y se debe grabar una alerta asociada a
+este cambio de estado.
+- Se deberá crear una tabla con consumos virtuales para probar el sistema, la misma deberá
+contener los atributos: nrotarjeta, codseguridad, nrocomercio, monto. Y se deberá
+hacer un procedimiento de testeo, que pida autorización para todos los consumos virtuales.
+- Todo el código SQL escrito para este trabajo práctico, deberá poder ejecutarse
+desde una aplicación CLI escrita en Go.
+
+=== JSON y Base de datos NoSQL
+
+Se deberá guardar los datos de clientes, tarjetas, comercios, y compras (tres por cada entidad)
+en una base de datos NoSQL basada en JSON. Para ello, utilizar la base de datos BoltDB.
+Este código, también deberá ejecutarse desde una aplicación CLI escrita en Go.
 
 == Descripción
+El programa se organiza en dos carpetas y un archivo escrito en Go que sirve como aplicación CLI:
+
+- Carpeta sql:
+* Contiene toda la lógica asociada a los ítems: Creación de la base de datos, Instancia de los datos y Stored procedures o triggers. 
+
+- Descripción de los métodos:
+* CrearDB(): Creación de la Base de Datos.
+* CrearTablas(): Creación de las tablas especificadas.
+* CrearPKyFK(): Utiliza los métodos crearPK() y crearFK() respectivamente.
+* EliminarPKyFK(): Utiliza los métodos eliminarPK() y eliminarFK() respectivamente.
+* CargarDatos(): Carga la cantidad de datos especificada en las tablas: cliente y comercio. Genera los cierres para el año 2020, llamando a _generarCierres().
+* generarCierres(): Crea una stored procedure que toma como parámetro el año y genera los cierres para ese año, para cada terminación posible.
+* _generarCierres(): Invoca a la función anterior para generar los cierres del 2020.
+* autorizarCompra(): Crea una stored procedure con parámetros: nrotarjeta, codseguridad, nrocomercio, y monto. Devuelve true si la compra fue autorizada y false si fue rechazada.
+* generarConsumo(): Crea una stored procedure con parámetro: cantidad. Genera la cantidad de consumos especificada, obteniendo los datos aleatoriamente de las tablas comercio y tarjeta y creando un monto aleatorio.
+* crearTriggerConsumo(): Llama a la función agregarTestConsumo para crear la función testear_consumo. Crea un trigger que se activa antes de cada insert en la tabla consumo. Por cada fila insertada, ejecuta la función testear_consumo().
+* agregarTestConsumo(): Crea una stored procedura testear_consumo que llama a la función autorizar compra con sus respectivos parámetros, con los valores new generados en el insert.
+* GenerarLogicaConsumo():Llama a las funciones: autorizarCompra, crearTriggerRechazo, crearTriggerConsumo, generarConsumo. Para generar las stored procedures y triggers relacionados a los consumos virtuales y su testeo. 
+* agregarRechazo(): Crea una stored procedure que toma como parámetros: nrotarjeta, nrocomercio, fecha y motivo e inserta esos valores en la tabla rechazo.  
+* crearTriggerRechazo(): Crea un trigger que antes de cada insert en rechazo, por cada fila insertada llama a la función agregar_alerta.
+* agregarAlertaRechazo(): Crea una stored procedure agregar_alerta que agrega una alerta con los valores a insertar en la tabla rechazo. Con codalerta: 0. Correspondiente a alertas generadas por rechazo.
+* GenerarResumen(): 
+- Carpeta no-sql: 
+* Contiene la resolución del ítem JSON y Base de datos NoSQL.
 
 En esta sección pueden incluirse las dificultades que tuvieron, las
 soluciones encontradas, las decisiones que se fueron tomando a lo largo
