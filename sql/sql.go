@@ -517,10 +517,17 @@ func agregarRechazo() {
 
 	_, err = db.Query(
 		`create or replace function agregarrechazo(_nrotarjeta char(16),_nrocomercio int, _fecha timestamp,_monto decimal(7,2),_motivo text) returns void as $$
-		
+		declare
+			numerorechazo int;
+
 		begin
 		
-		insert into rechazo(nrotarjeta, nrocomercio, fecha, monto, motivo) values( _nrotarjeta, _nrocomercio, current_timestamp, _monto, _motivo);
+		insert into rechazo(nrotarjeta, nrocomercio, fecha, monto, motivo) values( _nrotarjeta, _nrocomercio, current_timestamp, _monto, _motivo)
+		RETURNING nrorechazo INTO numerorechazo;
+
+		// mover insert rechazo
+		ChequearRechazoLimites(numerorechazo);
+		
 		end;
 		
 	$$ language plpgsql;`)
@@ -542,7 +549,7 @@ func agregarAlertaRechazo() {
 		begin
 
 		insert into alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion) values(new.nrotarjeta, new.fecha, new.nrorechazo, 0, new.motivo);
-	
+		
 		return new;
 		end;
 		
@@ -594,6 +601,7 @@ func CrearTriggersSeguridad() {
 		log.Fatal(err)
 	}
 }
+
 func seguridadCompras() {
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
@@ -701,6 +709,48 @@ func GenerarResumen() {
 				
 				   end;
 		$$ language plpgsql;`)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func ChequearRechazoLimites() {
+	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	_, err = db.Query(
+		`create or replace function ChequearRechazoLimites(numeroR int) returns void as $$
+		Declare
+			tarjetaR char(16);
+			fechaR timestamp;
+		begin
+	
+			SELECT nrotarjeta, fecha INTO tarjetaR, fechaR FROM rechazo where nrorechazo = numeroR;
+	
+			perform nrotarjeta 
+			from rechazo 
+			where nrotarjeta = tarjetaR
+			and fecha = fechaR
+			and motivo = 'Supera límite de tarjeta'
+			group by nrotarjeta
+			having count(*) > 1;
+			
+			if (found) then
+				insert into alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion) 
+				values (tarjetaR, fechaR, numeroR, 23, 'tarjeta suspendida');
+				
+				update tarjeta 
+				Set estado = 'suspendida'
+				where nroTarjeta = tarjetaR;
+			end if;	
+			
+		end;
+		$$ language plpgsql;`
+	)
 
 	if err != nil {
 		log.Fatal(err)
