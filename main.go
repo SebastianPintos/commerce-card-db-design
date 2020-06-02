@@ -57,7 +57,7 @@ func manejarOpciones(opcion int) bool {
 		sql.GenerarLogicaConsumo()
 		fmt.Println("Función creada")
 	case opcion == 7:
-		//	sql.CrearTriggerRechazo();
+			sql.GenerarLogicaAlertas()
 		fmt.Println("Se agregó lógica de alertas")
 	case opcion == 8:
 		noSQL.CargaDatosNoDB()

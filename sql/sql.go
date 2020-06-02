@@ -354,9 +354,15 @@ func autorizarCompra() {
 
 func GenerarLogicaConsumo() {
 	autorizarCompra()
-	crearTriggerRechazo()
+//	crearTriggerRechazo()
 	crearTriggerConsumo()
 	generarConsumo()
+}
+
+func GenerarLogicaAlertas(){
+	crearTriggerRechazo()
+	crearTriggersSeguridad()
+//	chequearRechazoLimites()
 }
 
 func generarConsumo() {
@@ -373,7 +379,7 @@ func generarConsumo() {
 			select into montoAleatorio ((random() * (80000 - 100)) + 100) as aleatorio;
 			select into comercioAleatorio nrocomercio from comercio order by random() limit 1;
 			select into tarjetaAleatoria * from tarjeta order by random() limit 1;
-			insert into consumo values(tarjetaAleatoria.nrotarjeta, tarjetaAleatoria.codseguridad, comercioAleatorio, montoAleatorio);
+			insert into consumo values(tarjetaAleatoria.nrotarjeta, tarjetaAleatoria.codseguridad, comercioAleatorio, cast(montoAleatorio as decimal(7,2)));
 		end loop;
 		end;
 
@@ -409,6 +415,7 @@ func agregarTestConsumo() {
 }
 
 func agregarRechazo() {
+	chequearRechazoLimites()
 	_, err = db.Query(
 		`create or replace function agregarrechazo(_nrotarjeta char(16),_nrocomercio int, _fecha timestamp,_monto decimal(7,2),_motivo text) returns void as $$
 		declare
@@ -420,7 +427,7 @@ func agregarRechazo() {
 		RETURNING nrorechazo INTO numerorechazo;
 
 		--mover insert rechazo
-		select ChequearRechazoLimites(numerorechazo);
+		perform ChequearRechazoLimites(numerorechazo);
 
 		end;
 
@@ -433,7 +440,7 @@ func agregarAlertaRechazo() {
 		`create or replace function agregar_alerta() returns trigger as $$
 		begin
 
-		insert into alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion) values(new.nrotarjeta, new.fecha, new.nrorechazo, 0, new.motivo);
+		insert into alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion) values(new.nrotarjeta, new.fecha, new.nrorechazo, 0 , new.motivo);
 
 		return new;
 		end;
@@ -455,7 +462,7 @@ func crearTriggerRechazo() {
 		`)
 	logErr(err)
 }
-func CrearTriggersSeguridad() {
+func crearTriggersSeguridad() {
 	seguridadCompras()
 	_, err = db.Query(
 		`create trigger compras_lapso_tiempo
@@ -479,7 +486,7 @@ func seguridadCompras() {
 			select * into ultimaCompra from compra where nrotarjeta = new.nrotarjeta order by nrooperacion desc limit 1;
 
 			if(not found) then
-				raise notice 'No hay compra anterior';
+				--raise notice 'No hay compra anterior';
 				return new;
 			end if;
 
@@ -489,12 +496,12 @@ func seguridadCompras() {
 			select codigopostal into codPostalActual from comercio where nrocomercio = new.nrocomercio;
 
 			if(difTimestamps < 1 and ultimaCompra.nrocomercio != new.nrocomercio and codPostalAnterior = codPostalActual) then
-				raise notice 'Alerta compra en menos de 1 minuto en una misma zona';
+				insert into alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion) values(new.nrotarjeta, new.fecha, -1, 1 , 'Compra en menos de 1 minuto en una misma zona');
 				return new;
 			end if;
 
 			if(difTimestamps < 5 and ultimaCompra.nrocomercio != new.nrocomercio and codPostalAnterior != codPostalActual) then
-				raise notice 'Alerta compra en menos de 5 minutos en diferentes zonas';
+				insert into alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion) values(new.nrotarjeta, new.fecha, -1, 5 , 'Compra en menos de 5 minutos en diferentes zonas');
 				return new;
 			end if;
 
@@ -563,7 +570,7 @@ func GenerarResumen() {
 	logErr(err)
 }
 
-func ChequearRechazoLimites() {
+func chequearRechazoLimites() {
 	_, err = db.Query(
 		`create or replace function ChequearRechazoLimites(numeroR int) returns void as $$
 		Declare
@@ -583,7 +590,7 @@ func ChequearRechazoLimites() {
 
 			if (found) then
 				insert into alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion)
-				values (tarjetaR, fechaR, numeroR, 23, 'tarjeta suspendida');
+				values (tarjetaR, fechaR, numeroR, 32, 'Tarjeta suspendida');
 
 				update tarjeta
 				Set estado = 'suspendida'
