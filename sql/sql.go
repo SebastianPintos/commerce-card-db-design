@@ -33,10 +33,10 @@ func CrearDB() {
 
 func CrearTablas() {
 	_, err = db.Exec(`DROP SCHEMA public CASCADE`)
-	logErr(_err)
+	logErr(err)
 
 	_, err = db.Exec(`CREATE SCHEMA public`)
-	logErr(_err)
+	logErr(err)
 
 	_, err = db.Exec(`create table cliente (nrocliente int,
 											nombre text,
@@ -103,7 +103,7 @@ func CrearTablas() {
 											nrocomercio int,
 											monto decimal(7,2)
 											)`)
-	logErr(_err)
+	logErr(err)
 }
 
 func CrearPKyFK() {
