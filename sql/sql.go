@@ -282,7 +282,7 @@ func CargarDatos() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_generarCierres()	
+	_generarCierres()
 }
 
 func _generarCierres() {
@@ -426,14 +426,14 @@ func autorizarCompra() {
 	}
 }
 
-func GenerarLogicaConsumo(){
+func GenerarLogicaConsumo() {
 	autorizarCompra()
 	crearTriggerRechazo()
 	crearTriggerConsumo()
-	generarConsumo()	
+	generarConsumo()
 }
 
-func generarConsumo(){
+func generarConsumo() {
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
@@ -464,8 +464,8 @@ func generarConsumo(){
 	}
 }
 
-func crearTriggerConsumo(){
-	agregarTestConsumo();
+func crearTriggerConsumo() {
+	agregarTestConsumo()
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
@@ -542,6 +542,7 @@ func agregarAlertaRechazo() {
 		begin
 
 		insert into alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion) values(new.nrotarjeta, new.fecha, new.nrorechazo, 0, new.motivo);
+	
 		return new;
 		end;
 		
@@ -552,8 +553,8 @@ func agregarAlertaRechazo() {
 	}
 }
 
-func crearTriggerRechazo(){
-	agregarAlertaRechazo();
+func crearTriggerRechazo() {
+	agregarAlertaRechazo()
 	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=test sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
@@ -627,7 +628,6 @@ func GenerarResumen() {
 							  FROM detalle 
 							  WHERE nroresumen = idResumen
 							  GROUP BY nroresumen);
-				if			 
 				UPDATE cabecera 
 				set total = totalPagar
 				WHERE nroresumen = idResumen;	
@@ -641,6 +641,3 @@ func GenerarResumen() {
 		log.Fatal(err)
 	}
 }
-
-
-
