@@ -11,7 +11,7 @@ v1, {docdate}. 	Rondelli, Hernan Daniel y Czemerinski, Hernan (COM-01)
 === Creación de la Base de Datos 
 
 - Se deberá:
-* Crear la respectiva base de datos 
+* Crear la respectiva Base de Datos.
 * Crear las tablas respetando los nombres de tablas, atributos y tipos de datos especificados.
 * Agregar las PK’s y FK’s de todas las tablas, por separado de la creación de las tablas. 
 * Permitir al usuario borrar todas las PK’s y FK’s, si así lo desea.
@@ -127,6 +127,6 @@ Se cambiaron los tipos de datos de: _nrooperacion, nrorechazo, nroresumen_ y _nr
 
 == Conclusiones
 
-A lo largo del desarrollo nos encontramos con algunas dificultades a la hora de trabajar sobre los requerimientos por lo que debimos consultar a los profesores.Esto nos hacia sentir un poco más próximo a un cliente.
+A lo largo del desarrollo nos encontramos con algunas dificultades a la hora de trabajar sobre los requerimientos por lo que debimos consultar a los profesores. Esto nos hacia sentir un poco más próximo a un cliente.
 En cuanto al desarrollo en sí, ademas de las diapositivas, tuvimos que leer bastante la documentación de postgresql para resolver las diferentes stored procedures y triggers que se nos presentaron.
 Como conclusión final, creemos que el trabajo realizado fue muy bueno. Pudimos cumplir con todos los puntos planteados y nos complementamos bien como equipo a la hora de trabajar.
