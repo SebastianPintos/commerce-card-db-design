@@ -127,6 +127,6 @@ Se cambiaron los tipos de datos de: _nrooperacion, nrorechazo, nroresumen_ y _nr
 
 == Conclusiones
 
-A lo largo del desarrollo nos encontramos con algunas dificultades a la hora de trabajar sobre los requerimientos por lo que debimos consultar a los profesores. Esto nos hacia sentir un poco más próximo a un cliente.
+A lo largo del desarrollo nos encontramos con algunas dificultades a la hora de trabajar sobre los requerimientos por lo que debimos consultar a los profesores. Esto nos hizo sentir un poco más próximo a un cliente.
 En cuanto al desarrollo en sí, ademas de las diapositivas, tuvimos que leer bastante la documentación de postgresql para resolver las diferentes stored procedures y triggers que se nos presentaron.
 Como conclusión final, creemos que el trabajo realizado fue muy bueno. Pudimos cumplir con todos los puntos planteados y nos complementamos bien como equipo a la hora de trabajar.
