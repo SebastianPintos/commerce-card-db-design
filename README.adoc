@@ -98,6 +98,7 @@ El programa se organiza en dos carpetas y un archivo escrito en Go (main) que si
 - Carpeta no-sql: 
 * Contiene la resolución del ítem JSON y Base de datos NoSQL.
 
+Se cambiaron los tipos de datos de: nrooperacion, nrorechazo, nroresumen y nroalerta por serial para facilitar el autoincremento de estos campos.
 En esta sección pueden incluirse las dificultades que tuvieron, las
 soluciones encontradas, las decisiones que se fueron tomando a lo largo
 del trabajo práctico, y las cuestiones de diseño que consideren
