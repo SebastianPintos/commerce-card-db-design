@@ -18,11 +18,10 @@ ortografía.
 
 === Creación de la Base de Datos 
 
-Se deberán crear las tablas respetando los nombres de tablas, atributos y tipos de datos
-especificados.
-Se deberán agregar las PK’s y FK’s de todas las tablas, por separado de la creación de las
-tablas. Además, el usuario deberá tener la posibilidad de borrar todas las PK’s y FK’s, si
-lo desea.
+-Se deberá:
+*Crear las tablas respetando los nombres de tablas, atributos y tipos de datos especificados.
+*Agregar las PK’s y FK’s de todas las tablas, por separado de la creación de las tablas. 
+* Permitir al usuario borrar todas las PK’s y FK’s, si así lo desea.
 
 === Instancia de los datos
 
@@ -91,31 +90,11 @@ en una base de datos NoSQL basada en JSON. Para ello, utilizar la base de datos 
 Este código, también deberá ejecutarse desde una aplicación CLI escrita en Go.
 
 == Descripción
-El programa se organiza en dos carpetas y un archivo escrito en Go que sirve como aplicación CLI:
+El programa se organiza en dos carpetas y un archivo escrito en Go (main) que sirve como aplicación CLI:
 
 - Carpeta sql:
 * Contiene toda la lógica asociada a los ítems: Creación de la base de datos, Instancia de los datos y Stored procedures o triggers. 
 
-- Descripción de los métodos:
-* CrearDB(): Creación de la Base de Datos.
-* CrearTablas(): Creación de las tablas especificadas.
-* CrearPKyFK(): Utiliza los métodos crearPK() y crearFK() respectivamente.
-* EliminarPKyFK(): Utiliza los métodos eliminarPK() y eliminarFK() respectivamente.
-* CargarDatos(): Carga la cantidad de datos especificada en las tablas: cliente y comercio. Genera los cierres para el año 2020, llamando a _generarCierres().
-* generarCierres(): Crea una stored procedure que toma como parámetro el año y genera los cierres para ese año, para cada terminación posible.
-* _generarCierres(): Invoca a la función anterior para generar los cierres del 2020.
-* autorizarCompra(): Crea una stored procedure con parámetros: nrotarjeta, codseguridad, nrocomercio, y monto. Devuelve true si la compra fue autorizada y false si fue rechazada.
-* generarConsumo(): Crea una stored procedure con parámetro: cantidad. Genera la cantidad de consumos especificada, obteniendo los datos aleatoriamente de las tablas comercio y tarjeta y creando un monto aleatorio.
-* crearTriggerConsumo(): Llama a la función agregarTestConsumo para crear la función testear_consumo. Crea un trigger que se activa antes de cada insert en la tabla consumo. Por cada fila insertada, ejecuta la función testear_consumo().
-* agregarTestConsumo(): Crea una stored procedura testear_consumo que llama a la función autorizar compra con sus respectivos parámetros, con los valores new generados en el insert.
-* GenerarLogicaConsumo():Llama a las funciones: autorizarCompra, crearTriggerRechazo, crearTriggerConsumo, generarConsumo. Para generar las stored procedures y triggers relacionados a los consumos virtuales y su testeo. 
-* agregarRechazo(): Crea una stored procedure que toma como parámetros: nrotarjeta, nrocomercio, fecha y motivo e inserta esos valores en la tabla rechazo.  
-* crearTriggerRechazo(): Crea un trigger que antes de cada insert en rechazo, por cada fila insertada llama a la función agregar_alerta.
-* agregarAlertaRechazo(): Crea una stored procedure agregar_alerta que agrega una alerta con los valores a insertar en la tabla rechazo. Con codalerta: 0. Correspondiente a alertas generadas por rechazo.
-* GenerarLogicaAlertas(): Se encarga de invocar a las funciones crearTriggerRechazo() y crearTriggerSeguridad() para generar los triggers correspondientes.
-* crearTriggerSeguridad(): Llama a la función seguridadCompras para crear la función compras_lapso_tiempo. Crea un trigger que se activa antes de cada insert en la tabla compras. Por cada fila insertada, ejecuta la función compras_lapso_tiempo().
-* seguridadCompras(): Es la encargada de crear la funcion del trigger compras_lapso_tiempo. Esta funcion checkea que las compras en un lapso de tiempo para una tarjeta en diferentes comercios esten dentro del requerimiento solicitado.
-* GenerarResumen(): 
 - Carpeta no-sql: 
 * Contiene la resolución del ítem JSON y Base de datos NoSQL.
 
@@ -127,8 +106,37 @@ importantes.
 También, se puede incluir una descripción general del programa—cómo
 funciona.
 
-== Implementación
 
+== Implementación
+- Descripción de los métodos del archivo sql.go:
+* CrearDB(): Creación de la Base de Datos.
+* CrearTablas(): Creación de las tablas especificadas.
+* CrearPKyFK(): Utiliza los métodos crearPK() y crearFK() respectivamente.
+* EliminarPKyFK(): Utiliza los métodos eliminarPK() y eliminarFK() respectivamente.
+* CargarDatos(): Carga la cantidad de datos especificada en las tablas: cliente y comercio. Genera los cierres para el año 2020, llamando a _generarCierres().
+* generarCierres(): Crea una stored procedure que toma como parámetro el año y genera los cierres para ese año, para cada terminación posible.
+* _generarCierres(): Invoca a la función anterior para generar los cierres del 2020.
+* autorizarCompra(): Crea una stored procedure con parámetros: nrotarjeta, codseguridad, nrocomercio, y monto. Devuelve true si la compra fue autorizada y false si fue rechazada.
+* generarConsumo(): Crea una stored procedure con parámetro: cantidad. Genera la cantidad de consumos especificada, obteniendo los datos aleatoriamente de las tablas comercio y tarjeta y creando un monto aleatorio.
+* crearTriggerConsumo(): Llama a la función agregarTestConsumo para crear la función testear_consumo. Crea un trigger que se activa antes de cada insert en la tabla consumo. Por cada fila insertada, ejecuta la función testear_consumo().
+* agregarTestConsumo(): Crea una stored procedura que llama a la función autorizar compra con sus respectivos parámetros, con los valores new generados en el insert.
+* GenerarLogicaConsumo() :Llama a las funciones: autorizarCompra, crearTriggerRechazo, crearTriggerConsumo, generarConsumo. Para generar las stored procedures y triggers relacionados a los consumos virtuales y su testeo. 
+* agregarRechazo(): Crea una stored procedure que toma como parámetros: nrotarjeta, nrocomercio, fecha y motivo e inserta esos valores en la tabla rechazo.  
+* crearTriggerRechazo(): Crea un trigger que antes de cada insert en rechazo, por cada fila insertada llama a la función agregar_alerta.
+* agregarAlertaRechazo(): Crea una stored procedure agregar_alerta que agrega una alerta con los valores a insertar en la tabla rechazo. Con codalerta: 0. Correspondiente a alertas generadas por rechazo.
+* GenerarLogicaAlertas(): Se encarga de invocar a las funciones crearTriggerRechazo() y crearTriggerSeguridad() para generar los triggers correspondientes.
+* crearTriggerSeguridad(): Llama a la función seguridadCompras para crear la función compras_lapso_tiempo. Crea un trigger que se activa antes de cada insert en la tabla compras. Por cada fila insertada, ejecuta la función compras_lapso_tiempo().
+* seguridadCompras(): Es la encargada de crear la funcion del trigger compras_lapso_tiempo. Esta funcion checkea que las compras en un lapso de tiempo para una tarjeta en diferentes comercios estén dentro del requerimiento solicitado.
+* GenerarResumen(): Crea una stored procedure que toma como parámetros: nrocliente, año, mes y retorna true si se ha podido generar el resumen y false en caso contrario. Para generarlo, se utiliza la terminación de la tarjeta del cliente y se busca el período solicitado con esa terminación en la tabla cierre. En caso de poder generar el resumen, marca las compras involucradas como pagadas.
+
+- Descripción de los métodos del archivo noSQL.go:
+* CargarDatosNoDB(): 
+* CargarCliente(db, nrocliente, nombre, apellido, domicilio, teléfono)
+* CargarTarjeta(db, nrotarjeta, nrocliente, validadesde, validahasta, codseguridad, limitecompra, estado)
+* CargarComercio(db, nrocomercio, nombre, domicilio, codigopostal, telefono)
+* CargarCompra(db, nrooperacion, nrotarjeta, nrocomercio, fecha, monto, pagado)
+* CreateUpdate(db, bucketName, key, value)
+* ReadUnique(db, bucketName, key)
 En esta sección se incluye el código fuente correctamente formateado—y
 comentado, si corresponde.
 
