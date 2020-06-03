@@ -6,14 +6,6 @@ v1, {docdate}. 	Rondelli, Hernan Daniel y Czemerinski, Hernan (COM-01)
 :source-highlighter: coderay
 :tabsize: 4
 
-El texto debe ser breve, conciso, simple, y directo. Se debe incluir
-sólo lo relevante que ayude a entender el trabajo práctico.
-
-Se recomiendan oraciones y párrafos cortos.
-
-Por último, no olvidar utilizar signos de puntuación y checkear la
-ortografía.
-
 == Introducción
 
 === Creación de la Base de Datos 
@@ -92,65 +84,45 @@ Este código, también deberá ejecutarse desde una aplicación CLI escrita en G
 == Descripción
 El programa se organiza en dos carpetas y un archivo escrito en Go (main) que sirve como aplicación CLI:
 
-- Carpeta sql:
-* Contiene toda la lógica asociada a los ítems: Creación de la base de datos, Instancia de los datos y Stored procedures o triggers. 
+- Carpeta _sql_:
+* Contiene toda la lógica asociada a los ítems: Creación de la base de datos, Instancia de los datos y _Stored procedures_ o _triggers_. 
 
-- Carpeta no-sql: 
-* Contiene la resolución del ítem JSON y Base de datos NoSQL.
+- Carpeta _no-sql_: 
+* Contiene la resolución del ítem _JSON_ y Base de datos _NoSQL_.
 
-Se cambiaron los tipos de datos de: nrooperacion, nrorechazo, nroresumen y nroalerta por serial para facilitar el autoincremento de estos campos.
-En esta sección pueden incluirse las dificultades que tuvieron, las
-soluciones encontradas, las decisiones que se fueron tomando a lo largo
-del trabajo práctico, y las cuestiones de diseño que consideren
-importantes.
-
-También, se puede incluir una descripción general del programa—cómo
-funciona.
-
+Se cambiaron los tipos de datos de: _nrooperacion, nrorechazo, nroresumen_ y _nroalerta_ por _serial_ para facilitar el autoincremento de estos campos.
 
 == Implementación
-- Descripción de los métodos del archivo sql.go:
-* CrearDB(): Creación de la Base de Datos.
-* CrearTablas(): Creación de las tablas especificadas.
-* CrearPKyFK(): Utiliza los métodos crearPK() y crearFK() respectivamente.
-* EliminarPKyFK(): Utiliza los métodos eliminarPK() y eliminarFK() respectivamente.
-* CargarDatos(): Carga la cantidad de datos especificada en las tablas: cliente y comercio. Genera los cierres para el año 2020, llamando a _generarCierres().
-* generarCierres(): Crea una stored procedure que toma como parámetro el año y genera los cierres para ese año, para cada terminación posible.
-* _generarCierres(): Invoca a la función anterior para generar los cierres del 2020.
-* autorizarCompra(): Crea una stored procedure con parámetros: nrotarjeta, codseguridad, nrocomercio, y monto. Devuelve true si la compra fue autorizada y false si fue rechazada.
-* generarConsumo(): Crea una stored procedure con parámetro: cantidad. Genera la cantidad de consumos especificada, obteniendo los datos aleatoriamente de las tablas comercio y tarjeta y creando un monto aleatorio.
-* crearTriggerConsumo(): Llama a la función agregarTestConsumo para crear la función testear_consumo. Crea un trigger que se activa antes de cada insert en la tabla consumo. Por cada fila insertada, ejecuta la función testear_consumo().
-* agregarTestConsumo(): Crea una stored procedura que llama a la función autorizar compra con sus respectivos parámetros, con los valores new generados en el insert.
-* GenerarLogicaConsumo() :Llama a las funciones: autorizarCompra, crearTriggerRechazo, crearTriggerConsumo, generarConsumo. Para generar las stored procedures y triggers relacionados a los consumos virtuales y su testeo. 
-* agregarRechazo(): Crea una stored procedure que toma como parámetros: nrotarjeta, nrocomercio, fecha y motivo e inserta esos valores en la tabla rechazo. Invoca a la función ChequearRechazoLimites(nrorechazo). 
-* crearTriggerRechazo(): Crea un trigger que antes de cada insert en rechazo, por cada fila insertada llama a la función agregar_alerta.
-* agregarAlertaRechazo(): Crea una stored procedure agregar_alerta que agrega una alerta con los valores a insertar en la tabla rechazo. Con codalerta: 0. Correspondiente a alertas generadas por rechazo.
-* GenerarLogicaAlertas(): Se encarga de invocar a las funciones crearTriggerRechazo() y crearTriggerSeguridad() para generar los triggers correspondientes.
-* crearTriggerSeguridad(): Llama a la función seguridadCompras para crear la función compras_lapso_tiempo. Crea un trigger que se activa antes de cada insert en la tabla compras. Por cada fila insertada, ejecuta la función compras_lapso_tiempo().
-* seguridadCompras(): Es la encargada de crear la función del trigger compras_lapso_tiempo. Esta función checkea que las compras en un lapso de tiempo para una tarjeta en diferentes comercios estén dentro del requerimiento solicitado. En caso de detectar dos compras con lapso menor a un minuto ubicadas en el mismo código postal, se deberá insertar una alerta con codalerta: 1. En caso de detectar dos compras con lapso menor a 5 minutos con diferentes códigos postales se deberá insertar una nueva alerta con codalerta: 5.
-* chequearRechazoLimites(): Crea una stored procedure que toma como parámetro: nrorechazo. Detecta si la tarjeta registra dos rechazos por exceso de límite en el mismo día. En ese caso, cambia el estado de la tarjeta a suspendida e inserta una nueva alerta con codalerta: 32.
-* GenerarResumen(): Crea una stored procedure que toma como parámetros: nrocliente, año, mes y retorna true si se ha podido generar el resumen y false en caso contrario. Para generarlo, se utiliza la terminación de la tarjeta del cliente y se busca el período solicitado con esa terminación en la tabla cierre. En caso de poder generar el resumen, marca las compras involucradas como pagadas.
+- Descripción de los métodos del archivo _sql.go_:
+* _CrearDB()_: Creación de la Base de Datos.
+* _CrearTablas()_: Creación de las tablas especificadas.
+* _CrearPKyFK()_: Utiliza los métodos _crearPK()_ y _crearFK()_ respectivamente.
+* _EliminarPKyFK()_: Utiliza los métodos _eliminarPK()_ y _eliminarFK()_ respectivamente.
+* _CargarDatos()_: Carga la cantidad de datos especificada en las tablas: _cliente_ y _comercio_. Genera los cierres para el año 2020, llamando a _ _generarCierres()._
+* _generarCierres()_: Crea una _stored procedure_ que toma como parámetro el año y genera los cierres para ese año, para cada terminación posible.
+* _generarCierres()_: Invoca a la función anterior para generar los cierres del 2020.
+* _autorizarCompra()_: Crea una _stored procedure_ con parámetros: _nrotarjeta, codseguridad, nrocomercio_, y _monto_. Devuelve _true_ si la compra fue autorizada y _false_ si fue rechazada.
+* _generarConsumo()_: Crea una _stored procedure_ con parámetro: _cantidad_. Genera la cantidad de consumos especificada, obteniendo los datos aleatoriamente de las tablas _comercio_ y _tarjeta_. Genera un _monto_ aleatorio.
+* _crearTriggerConsumo()_: Llama a la función _agregarTestConsumo()_ para crear la función _testear_consumo()_. Crea un _trigger_ que se activa antes de cada _insert_ en la tabla _consumo_. Por cada fila insertada, ejecuta la función _testear_consumo()_.
+* _agregarTestConsumo()_: Crea una _stored procedure_ que llama a la función _autorizarcompra_ con sus respectivos parámetros, con los valores _new_ generados en el _insert_.
+* _GenerarLogicaConsumo()_ :Llama a las funciones: _autorizarCompra, crearTriggerRechazo, crearTriggerConsumo, generarConsumo_. Para generar las _stored procedures_ y _triggers_ relacionados a los consumos virtuales y su testeo. 
+* _agregarRechazo()_: Crea una _stored procedure_ que toma como parámetros: _nrotarjeta, nrocomercio, fecha_ y _motivo_ e inserta esos valores en la tabla _rechazo_. Invoca a la función _ChequearRechazoLimites(nrorechazo)_. 
+* _crearTriggerRechazo()_: Crea un _trigger_ que antes de cada _insert_ en _rechazo_, por cada fila insertada llama a la función _agregar_alerta()_.
+* _agregarAlertaRechazo()_: Crea una _stored procedure agregar_alerta_ que agrega una _alerta_ con los valores a insertar en la tabla _rechazo_. Con _codalerta:_ 0. Correspondiente a alertas generadas por rechazo.
+* _GenerarLogicaAlertas()_: Se encarga de invocar a las funciones _crearTriggerRechazo()_ y _crearTriggerSeguridad()_ para generar los _triggers_ correspondientes.
+* _crearTriggerSeguridad()_: Llama a la función _seguridadCompras_ para crear la función _compras_lapso_tiempo_. Crea un _trigger_ que se activa antes de cada _insert_ en la tabla _compra_. Por cada fila insertada, ejecuta la función _compras_lapso_tiempo()_.
+* _seguridadCompras()_: Es la encargada de crear la función del _trigger_ _compras_lapso_tiempo_. Esta función checkea que las compras en un lapso de tiempo para una tarjeta en diferentes comercios estén dentro del requerimiento solicitado. En caso de detectar dos compras con lapso menor a un minuto ubicadas en el mismo código postal, se deberá insertar una _alerta_ con _codalerta_: 1. En caso de detectar dos compras con lapso menor a 5 minutos con diferentes códigos postales se deberá insertar una nueva _alerta_ con _codalerta_: 5.
+* _chequearRechazoLimites()_: Crea una _stored procedure_ que toma como parámetro: nrorechazo. Detecta si la tarjeta registra dos rechazos por exceso de límite en el mismo día. En ese caso, cambia el _estado_ de la _tarjeta_ a _suspendida_ e inserta una nueva _alerta_ con _codalerta_: 32.
+* _GenerarResumen()_: Crea una _stored procedure_ que toma como parámetros: _nrocliente, año, mes_ y retorna _true_ si se ha podido generar el resumen y _false_ en caso contrario. Para generarlo, se utiliza la terminación de la tarjeta del _cliente_ y se busca el período solicitado con esa terminación en la tabla _cierre_. En caso de poder generar el resumen, marca las compras involucradas como pagadas.
 
-- Descripción de los métodos del archivo noSQL.go:
-* CargarDatosNoDB(): Se conecta a la base de datos y utiliza a las funciones CargarCliente, CargarTarjeta, CargarComercio y CargarCompra. Indicando como primer parámetro la base de datos, y luego en orden los datos de cliente, tarjeta, comercio y compra respectivamente. Respetando el órden y tipo de dato de sus atributos. Carga tres filas de cada tipo.
-* CargarCliente(db, nrocliente, nombre, apellido, domicilio, teléfono): Crea un cliente utilizando el struct Cliente, con los parámetros especificados. Utiliza a la función CreateUpdate para escribir en el bucket, pasándole como parámetros: la base de datos, Cliente como nombre del bucket, nrocliente perteneciente a cliente como string (clave) y un marshaling de cliente como valor.
-* CargarTarjeta(db, nrotarjeta, nrocliente, validadesde, validahasta, codseguridad, limitecompra, estado): Crea una tarjeta utilizando el struct Tarjeta, con los parámetros especificados. Utiliza a la función CreateUpdate para escribir en el bucket, pasándole como parámetros: la base de datos, Tarjeta como nombre del bucket, nrotarjeta perteneciente a tarjeta como string (clave) y un marshaling de tarjeta como valor.
-* CargarComercio(db, nrocomercio, nombre, domicilio, codigopostal, telefono): Crea un comercio utilizando el struct Comercio, con los parámetros especificados. Utiliza a la función CreateUpdate para escribir en el bucket, pasándole como parámetros: la base de datos, Comercio como nombre del bucket, nrocomercio perteneciente a comercio como string (clave) y un marshaling de comercio como valor.
-* CargarCompra(db, nrooperacion, nrotarjeta, nrocomercio, fecha, monto, pagado): Crea una compra utilizando el struct Compra, con los parámetros especificados. Utiliza a la función CreateUpdate para escribir en el bucket, pasándole como parámetros: la base de datos, Compra como nombre del bucket, nrooperacion perteneciente a compra como string (clave) y un marshaling de compra como valor.
-* CreateUpdate(db, bucketName, key, value): Abre una transacción de escritura, crea el bucket si no existe con el nombre indicado. Escribe los datos key, value especificados en el bucket y luego cierra la transacción.
-* ReadUnique(db, bucketName, key): Abre una transacción de lectura con el nombre del bucket pasado como parámetro, y obtiene los datos asociados a la clave especificada.
-
-En esta sección se incluye el código fuente correctamente formateado—y
-comentado, si corresponde.
-
-Además, por cada fragmento de código
-relevante—i.e. función, método, procedimiento—se debe dar una
-breve descripción, decir qué hace, y especificar los parámetros que
-toma la función/método/procedimiento, junto con los valores que devuelve
-ó modifica.
-
-_No debería incluirse el código de librerías/frameworks que se
-utilicen—a no ser que sea absolutamente necesario._
+- Descripción de los métodos del archivo _noSQL.go_:
+* _CargarDatosNoDB()_: Se conecta a la base de datos y utiliza a las funciones _CargarCliente, CargarTarjeta, CargarComercio_ y _CargarCompra_. Indicando como primer parámetro la base de datos, y luego en orden los datos de _cliente, tarjeta, comercio y compra respectivamente_. Respetando el órden y tipo de dato de sus atributos. Carga tres filas de cada tipo.
+* _CargarCliente(db, nrocliente, nombre, apellido, domicilio, teléfono)_: Crea un _cliente_ utilizando el _struct Cliente_, con los parámetros especificados. Utiliza a la función _CreateUpdate_ para escribir en el _bucket_, pasándole como parámetros: la base de datos, _Cliente_ como nombre del _bucket, nrocliente_ perteneciente a _cliente_ como _string_ (clave) y un _marshaling_ de _cliente_ como valor.
+* _CargarTarjeta(db, nrotarjeta, nrocliente, validadesde, validahasta, codseguridad, limitecompra, estado)_: Crea una _tarjeta_ utilizando el _struct Tarjeta_, con los parámetros especificados. Utiliza a la función _CreateUpdate_ para escribir en el _bucket_, pasándole como parámetros: la base de datos, _Tarjeta_ como nombre del _bucket_, _nrotarjeta_ perteneciente a _tarjeta_ como _string_ (clave) y un _marshaling_ de _tarjeta_ como valor.
+* _CargarComercio(db, nrocomercio, nombre, domicilio, codigopostal, telefono)_: Crea un _comercio_ utilizando el _struct_ _Comercio_, con los parámetros especificados. Utiliza a la función _CreateUpdate_ para escribir en el _bucket_, pasándole como parámetros: la base de datos, _Comercio_ como nombre del _bucket_, _nrocomercio_ perteneciente a _comercio_ como _string_ (clave) y un _marshaling_ de _comercio_ como valor.
+* _CargarCompra(db, nrooperacion, nrotarjeta, nrocomercio, fecha, monto, pagado)_: Crea una _compra_ utilizando el _struct Compra_, con los parámetros especificados. Utiliza a la función _CreateUpdate_ para escribir en el _bucket_, pasándole como parámetros: la base de datos, _Compra_ como nombre del _bucket, nrooperacion_ perteneciente a _compra_ como _string_ (clave) y un _marshaling_ de _compra_ como valor.
+* _CreateUpdate(db, bucketName, key, value)_: Abre una transacción de escritura, crea el _bucket_ si no existe con el nombre indicado. Escribe los datos _key, value_ especificados en el _bucket_ y luego cierra la transacción.
+* _ReadUnique(db, bucketName, key)_: Abre una transacción de lectura con el nombre del _bucket_ pasado como parámetro, y obtiene los datos asociados a la clave especificada.
 
 == Conclusiones
 
