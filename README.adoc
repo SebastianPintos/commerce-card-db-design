@@ -11,6 +11,7 @@ v1, {docdate}. 	Rondelli, Hernan Daniel y Czemerinski, Hernan (COM-01)
 === Creación de la Base de Datos 
 
 - Se deberá:
+* Crear la respectiva base de datos 
 * Crear las tablas respetando los nombres de tablas, atributos y tipos de datos especificados.
 * Agregar las PK’s y FK’s de todas las tablas, por separado de la creación de las tablas. 
 * Permitir al usuario borrar todas las PK’s y FK’s, si así lo desea.
