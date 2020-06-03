@@ -479,7 +479,7 @@ func seguridadCompras() {
 		DECLARE
 			ultimaCompra record;
 			difTimestamps decimal;
-			codPostalAnteriOR int;
+			codPostalAnterior int;
 			codPostalActual int;
 		BEGIN
 			SELECT * INTO ultimaCompra FROM compra WHERE nrotarjeta = new.nrotarjeta ORDER BY nrooperacion DESC LIMIT 1;
@@ -490,15 +490,15 @@ func seguridadCompras() {
 
 			SELECT INTO difTimestamps EXTRACT(EPOCH FROM new.fecha - ultimaCompra.fecha) / 60;
 
-			SELECT codigopostal INTO codPostalAnteriOR FROM comercio WHERE nrocomercio = ultimaCompra.nrocomercio;
+			SELECT codigopostal INTO codPostalAnterior FROM comercio WHERE nrocomercio = ultimaCompra.nrocomercio;
 			SELECT codigopostal INTO codPostalActual FROM comercio WHERE nrocomercio = new.nrocomercio;
 
-			if(difTimestamps < 1 and ultimaCompra.nrocomercio != new.nrocomercio and codPostalAnteriOR = codPostalActual) THEN
+			if(difTimestamps < 1 and ultimaCompra.nrocomercio != new.nrocomercio and codPostalAnterior = codPostalActual) THEN
 				INSERT INTO alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion) VALUES(new.nrotarjeta, new.fecha, -1, 1 , 'Compra en menos de 1 minuto en una misma zona');
 				return new;
 			END IF;
 
-			if(difTimestamps < 5 and ultimaCompra.nrocomercio != new.nrocomercio and codPostalAnteriOR != codPostalActual) THEN
+			if(difTimestamps < 5 and ultimaCompra.nrocomercio != new.nrocomercio and codPostalAnterior != codPostalActual) THEN
 				INSERT INTO alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion) VALUES(new.nrotarjeta, new.fecha, -1, 5 , 'Compra en menos de 5 minutos en diferentes zonas');
 				return new;
 			END IF;
