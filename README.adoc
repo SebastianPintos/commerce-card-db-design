@@ -25,10 +25,10 @@ ortografía.
 
 === Instancia de los datos
 
-Se deberán cargar 20 clientes y 20 comercios. Todos los clientes tendrán una tarjeta,
-excepto dos clientes que tendrán dos tarjetas cada uno. Una tarjeta deberá estar expirada
-en su fecha de vencimiento.
-La tabla cierre deberá tener los cierres de las tarjetas para todo el año 2020.
+- Se deberán cargar 20 clientes y 20 comercios. Todos los clientes tendrán una tarjeta,
+excepto dos clientes que tendrán dos tarjetas cada uno. 
+- Una tarjeta deberá estar expirada en su fecha de vencimiento.
+- La tabla cierre deberá tener los cierres de las tarjetas para todo el año 2020.
 
 === Stored procedures o triggers
 
