@@ -112,6 +112,9 @@ El programa se organiza en dos carpetas y un archivo escrito en Go que sirve com
 * agregarRechazo(): Crea una stored procedure que toma como parámetros: nrotarjeta, nrocomercio, fecha y motivo e inserta esos valores en la tabla rechazo.  
 * crearTriggerRechazo(): Crea un trigger que antes de cada insert en rechazo, por cada fila insertada llama a la función agregar_alerta.
 * agregarAlertaRechazo(): Crea una stored procedure agregar_alerta que agrega una alerta con los valores a insertar en la tabla rechazo. Con codalerta: 0. Correspondiente a alertas generadas por rechazo.
+* GenerarLogicaAlertas(): Se encarga de invocar a las funciones crearTriggerRechazo() y crearTriggerSeguridad() para generar los triggers correspondientes.
+* crearTriggerSeguridad(): Llama a la función seguridadCompras para crear la función compras_lapso_tiempo. Crea un trigger que se activa antes de cada insert en la tabla compras. Por cada fila insertada, ejecuta la función compras_lapso_tiempo().
+* seguridadCompras(): Es la encargada de crear la funcion del trigger compras_lapso_tiempo. Esta funcion checkea que las compras en un lapso de tiempo para una tarjeta en diferentes comercios esten dentro del requerimiento solicitado.
 * GenerarResumen(): 
 - Carpeta no-sql: 
 * Contiene la resolución del ítem JSON y Base de datos NoSQL.
