@@ -265,19 +265,19 @@ func generarCierres() {
 					_mes=1;
 				END IF;
 				if(mes<10 and _mes<10) THEN
-					fechainicio=concat(CAST(año as text),'0',CAST(mes as text),'01');
-					fechafin=concat(CAST(año as text),'0',CAST(_mes as text),'01');
-					fechavto=concat(CAST(año as text),'0',CAST(_mes as text),'15');
+					fechainicio=CONCAT(CAST(año as text),'0',CAST(mes as text),'01');
+					fechafin=CONCAT(CAST(año as text),'0',CAST(_mes as text),'01');
+					fechavto=CONCAT(CAST(año as text),'0',CAST(_mes as text),'15');
 				END IF;
 				if(mes>=10 and _mes>=10) THEN
-					fechainicio=concat(CAST(año as text),CAST(mes as text),'01');
-					fechafin=concat(CAST(año as text),CAST(_mes as text),'01');
-					fechavto=concat(CAST(año as text),CAST(_mes as text),'15');
+					fechainicio=CONCAT(CAST(año as text),CAST(mes as text),'01');
+					fechafin=CONCAT(CAST(año as text),CAST(_mes as text),'01');
+					fechavto=CONCAT(CAST(año as text),CAST(_mes as text),'15');
 				END IF;
 				if(mes>=10 and _mes<10) THEN
-					fechainicio=concat(CAST(año as text),CAST(mes as text),'01');
-					fechafin=concat(CAST(año as text),CAST(_mes as text),'01');
-					fechavto=concat(CAST(año as text),'0',CAST(_mes as text),'15');
+					fechainicio=CONCAT(CAST(año as text),CAST(mes as text),'01');
+					fechafin=CONCAT(CAST(año as text),CAST(_mes as text),'01');
+					fechavto=CONCAT(CAST(año as text),'0',CAST(_mes as text),'15');
 				END IF;
 
 				INSERT INTO cierre VALUES(año, mes, terminacion, TO_DATE(fechainicio,'YYYYMMDD'), TO_DATE(fechafin,'YYYYMMDD'), TO_DATE(fechavto,'YYYYMMDD'));
