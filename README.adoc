@@ -126,10 +126,6 @@ Se cambiaron los tipos de datos de: _nrooperacion, nrorechazo, nroresumen_ y _nr
 
 == Conclusiones
 
-Aquí van algunas reflexiones acerca del proceso de desarrollo del
-trabajo realizado, y de los resultados obtenidos.
-
-También se puede incluir una conclusión final de producto terminado.
-
-Pueden incluirse lecciones aprendidas durante el desarrollo del trabajo.
-
+A lo largo del desarrollo nos encontramos con algunas dificultades a la hora de trabajar sobre los requerimientos por lo que debimos consultar a los profesores.Esto nos hacia sentir un poco más próximo a un cliente.
+En cuanto al desarrollo en sí, ademas de las diapositivas, tuvimos que leer bastante la documentación de postgresql para resolver las diferentes stored procedures y triggers que se nos presentaron.
+Como conclusión final, creemos que el trabajo realizado fue muy bueno. Pudimos cumplir con todos los puntos planteados y nos complementamos bien como equipo a la hora de trabajar.
