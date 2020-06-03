@@ -132,13 +132,14 @@ funciona.
 * GenerarResumen(): Crea una stored procedure que toma como parámetros: nrocliente, año, mes y retorna true si se ha podido generar el resumen y false en caso contrario. Para generarlo, se utiliza la terminación de la tarjeta del cliente y se busca el período solicitado con esa terminación en la tabla cierre. En caso de poder generar el resumen, marca las compras involucradas como pagadas.
 
 - Descripción de los métodos del archivo noSQL.go:
-* CargarDatosNoDB(): 
-* CargarCliente(db, nrocliente, nombre, apellido, domicilio, teléfono)
-* CargarTarjeta(db, nrotarjeta, nrocliente, validadesde, validahasta, codseguridad, limitecompra, estado)
-* CargarComercio(db, nrocomercio, nombre, domicilio, codigopostal, telefono)
-* CargarCompra(db, nrooperacion, nrotarjeta, nrocomercio, fecha, monto, pagado)
-* CreateUpdate(db, bucketName, key, value)
-* ReadUnique(db, bucketName, key)
+* CargarDatosNoDB(): Se conecta a la base de datos y utiliza a las funciones CargarCliente, CargarTarjeta, CargarComercio y CargarCompra. Indicando como primer parámetro la base de datos, y luego en orden los datos de cliente, tarjeta, comercio y compra respectivamente. Respetando el órden y tipo de dato de sus atributos. Carga tres filas de cada tipo.
+* CargarCliente(db, nrocliente, nombre, apellido, domicilio, teléfono): Crea un cliente utilizando el struct Cliente, con los parámetros especificados. Utiliza a la función CreateUpdate para escribir en el bucket, pasándole como parámetros: la base de datos, Cliente como nombre del bucket, nrocliente perteneciente a cliente como string (clave) y un marshaling de cliente como valor.
+* CargarTarjeta(db, nrotarjeta, nrocliente, validadesde, validahasta, codseguridad, limitecompra, estado): Crea una tarjeta utilizando el struct Tarjeta, con los parámetros especificados. Utiliza a la función CreateUpdate para escribir en el bucket, pasándole como parámetros: la base de datos, Tarjeta como nombre del bucket, nrotarjeta perteneciente a tarjeta como string (clave) y un marshaling de tarjeta como valor.
+* CargarComercio(db, nrocomercio, nombre, domicilio, codigopostal, telefono): Crea un comercio utilizando el struct Comercio, con los parámetros especificados. Utiliza a la función CreateUpdate para escribir en el bucket, pasándole como parámetros: la base de datos, Comercio como nombre del bucket, nrocomercio perteneciente a comercio como string (clave) y un marshaling de comercio como valor.
+* CargarCompra(db, nrooperacion, nrotarjeta, nrocomercio, fecha, monto, pagado): Crea una compra utilizando el struct Compra, con los parámetros especificados. Utiliza a la función CreateUpdate para escribir en el bucket, pasándole como parámetros: la base de datos, Compra como nombre del bucket, nrooperacion perteneciente a compra como string (clave) y un marshaling de compra como valor.
+* CreateUpdate(db, bucketName, key, value): Abre una transacción de escritura, crea el bucket si no existe con el nombre indicado. Escribe los datos key, value especificados en el bucket y luego cierra la transacción.
+* ReadUnique(db, bucketName, key): Abre una transacción de lectura con el nombre del bucket pasado como parámetro, y obtiene los datos asociados a la clave especificada.
+
 En esta sección se incluye el código fuente correctamente formateado—y
 comentado, si corresponde.
 
