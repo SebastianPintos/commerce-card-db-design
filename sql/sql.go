@@ -27,7 +27,7 @@ func CrearDB() {
 
 	defer _db.Close()
 
-	_, _err = _db.Exec(`create database test2`)
+	_, _err = _db.Exec(`CREATE DATABASE test2`)
 	logErr(_err)
 }
 
@@ -38,44 +38,44 @@ func CrearTablas() {
 	_, err = db.Exec(`CREATE SCHEMA public`)
 	logErr(err)
 
-	_, err = db.Exec(`create table cliente (nrocliente int,
+	_, err = db.Exec(`CREATE TABLE cliente (nrocliente int,
 											nombre text,
 											apellido text,
 											domicilio text,
 											telefono char(12));
-		create table tarjeta (nrotarjeta char(16),
+		CREATE TABLE tarjeta (nrotarjeta char(16),
 											nrocliente int,
 											validadesde char(6),
 											validahasta char(6),
 											codseguridad char(4),
 											limitecompra decimal(8,2),
 											estado char(10));
-		create table comercio (nrocomercio int,
+		CREATE TABLE comercio (nrocomercio int,
 											nombre text,
 											domicilio text,
 											codigopostal text,
 											telefono char(12));
-		create table compra (nrooperacion serial,
+		CREATE TABLE compra (nrooperacion serial,
 											nrotarjeta char(16),
 											nrocomercio int,
 											fecha timestamp,
 											monto decimal(7,2),
 											pagado bool);
-		create table rechazo (nrorechazo serial,
+		CREATE TABLE rechazo (nrorechazo serial,
 											nrotarjeta char(16),
 											nrocomercio int,
 											fecha timestamp,
 											monto decimal(7,2),
 											motivo text
 											);
-		create table cierre (año int,
+		CREATE TABLE cierre (año int,
 											mes int,
 											terminacion int,
 											fechainicio date,
 											fechacierre date,
 											fechavto date
 											);
-		create table cabecera(nroresumen serial,
+		CREATE TABLE cabecera(nroresumen serial,
 											nombre text,
 											apellido text,
 											domicilio text,
@@ -85,20 +85,20 @@ func CrearTablas() {
 											vence date,
 											total decimal(8,2)
 											);
-		create table detalle(nroresumen serial,
+		CREATE TABLE detalle(nroresumen serial,
 											nrolinea int,
 											fecha date,
 											nombrecomercio text,
 											monto decimal(7,2)
 											);
-		create table alerta (nroalerta serial,
+		CREATE TABLE alerta (nroalerta serial,
 											nrotarjeta char(16),
 											fecha timestamp,
 											nrorechazo int,
 											codalerta int,
 											descripcion text
 											);
-		create table consumo(nrotarjeta char(16),
+		CREATE TABLE consumo(nrotarjeta char(16),
 											codseguridad char(4),
 											nrocomercio int,
 											monto decimal(7,2)
@@ -117,122 +117,122 @@ func EliminarPKyFK() {
 }
 
 func crearPK() {
-	_, err = db.Exec(`alter table cliente add constraint cliente_pk primary key (nrocliente);
-					  alter table tarjeta add constraint tarjeta_pk primary key (nrotarjeta);
-					  alter table comercio add constraint comercio_pk primary key (nrocomercio);
-	                  alter table compra add constraint compra_pk primary key (nrooperacion);
-	                  alter table rechazo add constraint rechazo_pk primary key (nrorechazo);
-	                  alter table cierre add constraint cierre_pk primary key (año, mes, terminacion);
-	                  alter table cabecera add constraint cabecera_pk primary key (nroresumen);
-	                  alter table detalle add constraint detalle_pk primary key (nroresumen, nrolinea);
-					  alter table alerta add constraint alerta_pk primary key (nroalerta);`)
+	_, err = db.Exec(`ALTER TABLE cliente ADD CONSTRAINT cliente_pk PRIMARY KEY (nrocliente);
+					  ALTER TABLE tarjeta ADD CONSTRAINT tarjeta_pk PRIMARY KEY (nrotarjeta);
+					  ALTER TABLE comercio ADD CONSTRAINT comercio_pk PRIMARY KEY (nrocomercio);
+	                  ALTER TABLE compra ADD CONSTRAINT compra_pk PRIMARY KEY (nrooperacion);
+	                  ALTER TABLE rechazo ADD CONSTRAINT rechazo_pk PRIMARY KEY (nrorechazo);
+	                  ALTER TABLE cierre ADD CONSTRAINT cierre_pk PRIMARY KEY (año, mes, terminacion);
+	                  ALTER TABLE cabecera ADD CONSTRAINT cabecera_pk PRIMARY KEY (nroresumen);
+	                  ALTER TABLE detalle ADD CONSTRAINT detalle_pk PRIMARY KEY (nroresumen, nrolinea);
+					  ALTER TABLE alerta ADD CONSTRAINT alerta_pk PRIMARY KEY (nroalerta);`)
 	logErr(err)
 }
 
 func crearFK() {
-	_, err = db.Exec(`alter table tarjeta add constraint tarjeta_nrocliente_fk foreign key (nrocliente) references cliente(nrocliente);
-					  alter table compra add constraint compra_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
-					  alter table compra add constraint compra_nrocomercio_fk foreign key (nrocomercio) references comercio(nrocomercio);
-					  alter table rechazo add constraint rechazo_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
-					  alter table rechazo add constraint rechazo_nrocomercio_fk foreign key (nrocomercio) references comercio(nrocomercio);
-					  alter table cabecera add constraint cabecera_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
-					  alter table detalle add constraint detalle_cabecera_fk foreign key (nroresumen) references cabecera(nroresumen);
-					  alter table alerta add constraint alerta_nrotarjeta_fk foreign key (nrotarjeta) references tarjeta(nrotarjeta);
+	_, err = db.Exec(`ALTER TABLE tarjeta ADD CONSTRAINT tarjeta_nrocliente_fk FOREIGN KEY (nrocliente) REFERENCES cliente(nrocliente);
+					  ALTER TABLE compra ADD CONSTRAINT compra_nrotarjeta_fk FOREIGN KEY (nrotarjeta) REFERENCES tarjeta(nrotarjeta);
+					  ALTER TABLE compra ADD CONSTRAINT compra_nrocomercio_fk FOREIGN KEY (nrocomercio) REFERENCES comercio(nrocomercio);
+					  ALTER TABLE rechazo ADD CONSTRAINT rechazo_nrotarjeta_fk FOREIGN KEY (nrotarjeta) REFERENCES tarjeta(nrotarjeta);
+					  ALTER TABLE rechazo ADD CONSTRAINT rechazo_nrocomercio_fk FOREIGN KEY (nrocomercio) REFERENCES comercio(nrocomercio);
+					  ALTER TABLE cabecera ADD CONSTRAINT cabecera_nrotarjeta_fk FOREIGN KEY (nrotarjeta) REFERENCES tarjeta(nrotarjeta);
+					  ALTER TABLE detalle ADD CONSTRAINT detalle_cabecera_fk FOREIGN KEY (nroresumen) REFERENCES cabecera(nroresumen);
+					  ALTER TABLE alerta ADD CONSTRAINT alerta_nrotarjeta_fk FOREIGN KEY (nrotarjeta) REFERENCES tarjeta(nrotarjeta);
 					`)
 	logErr(err)
 }
 
 func eliminarPK() {
-	_, err = db.Exec(`alter table cliente drop constraint cliente_pk;
-					  alter table tarjeta drop constraint tarjeta_pk;
-					  alter table comercio drop constraint comercio_pk;
-	                  alter table compra drop constraint compra_pk;
-	                  alter table rechazo drop constraint rechazo_pk;
-	                  alter table cierre drop constraint cierre_pk;
-	                  alter table cabecera drop constraint cabecera_pk;
-	                  alter table detalle drop constraint detalle_pk;
-	                  alter table alerta drop constraint alerta_pk;
+	_, err = db.Exec(`ALTER TABLE cliente DROP CONSTRAINT cliente_pk;
+					  ALTER TABLE tarjeta DROP CONSTRAINT tarjeta_pk;
+					  ALTER TABLE comercio DROP CONSTRAINT comercio_pk;
+	                  ALTER TABLE compra DROP CONSTRAINT compra_pk;
+	                  ALTER TABLE rechazo DROP CONSTRAINT rechazo_pk;
+	                  ALTER TABLE cierre DROP CONSTRAINT cierre_pk;
+	                  ALTER TABLE cabecera DROP CONSTRAINT cabecera_pk;
+	                  ALTER TABLE detalle DROP CONSTRAINT detalle_pk;
+	                  ALTER TABLE alerta DROP CONSTRAINT alerta_pk;
 	                `)
 	logErr(err)
 }
 
 func eliminarFK() {
-	_, err = db.Exec(`alter table tarjeta drop constraint tarjeta_nrocliente_fk;
-					  alter table compra drop constraint compra_nrotarjeta_fk;
-					  alter table compra drop constraint compra_nrocomercio_fk;
-					  alter table rechazo drop constraint rechazo_nrotarjeta_fk;
-					  alter table rechazo drop constraint rechazo_nrocomercio_fk;
-					  alter table cabecera drop constraint cabecera_nrotarjeta_fk;
-					  alter table detalle drop constraint detalle_cabecera_fk;
-					  alter table alerta drop constraint alerta_nrotarjeta_fk;`)
+	_, err = db.Exec(`ALTER TABLE tarjeta DROP CONSTRAINT tarjeta_nrocliente_fk;
+					  ALTER TABLE compra DROP CONSTRAINT compra_nrotarjeta_fk;
+					  ALTER TABLE compra DROP CONSTRAINT compra_nrocomercio_fk;
+					  ALTER TABLE rechazo DROP CONSTRAINT rechazo_nrotarjeta_fk;
+					  ALTER TABLE rechazo DROP CONSTRAINT rechazo_nrocomercio_fk;
+					  ALTER TABLE cabecera DROP CONSTRAINT cabecera_nrotarjeta_fk;
+					  ALTER TABLE detalle DROP CONSTRAINT detalle_cabecera_fk;
+					  ALTER TABLE alerta DROP CONSTRAINT alerta_nrotarjeta_fk;`)
 	logErr(err)
 }
 
 func CargarDatos() {
-	_, err = db.Exec(`insert into cliente values(11348773,'Rocío', 'Losada','Av. Presidente Perón 1530',1151102983);
-					  insert into cliente values(12349972,'María Estela', 'Martínez','Belgrano 1830',1150006655);
-					  insert into cliente values(22648991,'Laura', 'Santos','Italia 220',1153399452);
-					  insert into cliente values(11341003,'Graciela', 'Chasco','Tribulato 1340',1258579091);
-					  insert into cliente values(51558783,'Gabriela', 'Troncoso','Muñoz 1820',112234667);
-					  insert into cliente values(21347800,'Marta', 'Carbajo','San Luis 873',111998340);
-					  insert into cliente values(11448979,'Belén', 'Ferraris','Echeverría 780',113229087);
-					  insert into cliente values(44349773,'Abril', 'Hernández','Av. Sourdeaux 1700',115598342);
-					  insert into cliente values(33348679,'Sofía', 'Godoy','Av. Senador Morón 1221',114558004);
-					  insert into cliente values(25348533,'Adriana', 'Golluscio','Misiones 725',112111558);
-					  insert into cliente values(12228777,'Juan Carlos', 'Leguizamon','Serrano 120',1151101182);
-					  insert into cliente values(32680014,'Alberto', 'Ferrero','Pardo 990',1159944558);
-					  insert into cliente values(21545800,'Roberto', 'Ubertalli','Santa Fé 160',110076548);
-					  insert into cliente values(23679022,'Mario', 'Valdéz','Tucumán 550',116690874);
-					  insert into cliente values(12795452,'Lautaro', 'Flores','Río Diamante 186',113678652);
-					  insert into cliente values(11732790,'Bautista', 'Bello','Río Cuarto 191',111451419);
-					  insert into cliente values(29546643,'Diego', 'Fagnani','Av. Gaspar Campos 122',111009070);
-					  insert into cliente values(18397552,'Pedro', 'Tomarello','Av. San Martín 1511',110887547);
-					  insert into cliente values(13348765,'José', 'Mengarelli','Guido Spano 244',110044332);
-					  insert into cliente values(14348789,'Ricardo', 'Llanos','Corrientes 183',119034572);
+	_, err = db.Exec(`INSERT INTO cliente VALUES(11348773,'Rocío', 'Losada','Av. Presidente Perón 1530',1151102983);
+					  INSERT INTO cliente VALUES(12349972,'María Estela', 'Martínez','Belgrano 1830',1150006655);
+					  INSERT INTO cliente VALUES(22648991,'Laura', 'Santos','Italia 220',1153399452);
+					  INSERT INTO cliente VALUES(11341003,'Graciela', 'Chasco','Tribulato 1340',1258579091);
+					  INSERT INTO cliente VALUES(51558783,'Gabriela', 'Troncoso','Muñoz 1820',112234667);
+					  INSERT INTO cliente VALUES(21347800,'Marta', 'Carbajo','San Luis 873',111998340);
+					  INSERT INTO cliente VALUES(11448979,'Belén', 'Ferraris','Echeverría 780',113229087);
+					  INSERT INTO cliente VALUES(44349773,'Abril', 'Hernández','Av. Sourdeaux 1700',115598342);
+					  INSERT INTO cliente VALUES(33348679,'Sofía', 'Godoy','Av. SenadOR Morón 1221',114558004);
+					  INSERT INTO cliente VALUES(25348533,'Adriana', 'Golluscio','Misiones 725',112111558);
+					  INSERT INTO cliente VALUES(12228777,'Juan Carlos', 'Leguizamon','Serrano 120',1151101182);
+					  INSERT INTO cliente VALUES(32680014,'Alberto', 'Ferrero','Pardo 990',1159944558);
+					  INSERT INTO cliente VALUES(21545800,'Roberto', 'Ubertalli','Santa Fé 160',110076548);
+					  INSERT INTO cliente VALUES(23679022,'Mario', 'Valdéz','Tucumán 550',116690874);
+					  INSERT INTO cliente VALUES(12795452,'Lautaro', 'Flores','Río Diamante 186',113678652);
+					  INSERT INTO cliente VALUES(11732790,'Bautista', 'Bello','Río Cuarto 191',111451419);
+					  INSERT INTO cliente VALUES(29546643,'Diego', 'Fagnani','Av. Gaspar Campos 122',111009070);
+					  INSERT INTO cliente VALUES(18397552,'Pedro', 'Tomarello','Av. San Martín 1511',110887547);
+					  INSERT INTO cliente VALUES(13348765,'José', 'Mengarelli','Guido Spano 244',110044332);
+					  INSERT INTO cliente VALUES(14348789,'Ricardo', 'Llanos','Corrientes 183',119034572);
 
-					  insert into comercio values(501,'Kevingston', 'Av. Tte. Gral. Ricchieri 965', 1661 ,46666181);
-					  insert into comercio values(523,'47 street', 'Paunero 1575', 1663 ,47597581);
-					  insert into comercio values(513,'Garbarino', 'Av. Bartolomé Mitre 1198', 1661 ,08104440018);
-					  insert into comercio values(521,'Bella Vista Hogar', 'Av. Senador Morón 1094', 1661 ,46661544);
-					  insert into comercio values(578,'Panadería y Confitería: La Princesa', 'Av. Senador Morón 1200', 1661 ,46681339);
-					  insert into comercio values(564,'FOX', 'Av Pres. Juan Domingo Perón 907', 1663 ,46676777);
-					  insert into comercio values(569,'La Pata Loca', 'Av. Moisés Lebensohn 98', 1661 ,46660861);
-					  insert into comercio values(545,'Frávega', 'Av. Pres. Juan Domingo Perón 1127', 1663 ,44512063);
-					  insert into comercio values(543,'Spit Bella Vista', 'Av. Senador Morón 1452', 1661 ,1153519765);
-					  insert into comercio values(527,'Óptica Cristal', 'Av. Dr. Ricardo Balbín 1125', 1663 ,46649400);
-					  insert into comercio values(508,'Óptica Mattaldi', 'Av. Mattaldi 1141', 1661 ,46683911);
-					  insert into comercio values(509,'Estancia San Francisco San Miguel', 'Concejal Tribulato 1265', 1663 ,5446676082);
-					  insert into comercio values(500,'Rabelia heladería', 'San José 972', 1663 ,46649352);
-					  insert into comercio values(520,'Heladería Ciwe', 'San José 785', 1663 ,46646003);
-					  insert into comercio values(588,'Rever Pass', 'Paunero 1447,', 1663 ,44513921);
-					  insert into comercio values(582,'Rapsodia', 'Av. Pres. Arturo Umberto Illia 3770', 1663 ,1160911581);
-					  insert into comercio values(530,'Grimoldi', 'Paunero 1415', 1663 ,44517343);
-					  insert into comercio values(596,'Umma', 'Paunero 1476', 1663 ,44519267);
-					  insert into comercio values(538,'COTO', 'Ohiggins 1280', 1661 ,46682636);
-					  insert into comercio values(553,'Disco', 'Av. Senador Morón 960', 1661 ,08107778888);
+					  INSERT INTO comercio VALUES(501,'Kevingston', 'Av. Tte. Gral. Ricchieri 965', 1661 ,46666181);
+					  INSERT INTO comercio VALUES(523,'47 street', 'Paunero 1575', 1663 ,47597581);
+					  INSERT INTO comercio VALUES(513,'Garbarino', 'Av. Bartolomé Mitre 1198', 1661 ,08104440018);
+					  INSERT INTO comercio VALUES(521,'Bella Vista Hogar', 'Av. SenadOR Morón 1094', 1661 ,46661544);
+					  INSERT INTO comercio VALUES(578,'Panadería y Confitería: La Princesa', 'Av. SenadOR Morón 1200', 1661 ,46681339);
+					  INSERT INTO comercio VALUES(564,'FOX', 'Av Pres. Juan Domingo Perón 907', 1663 ,46676777);
+					  INSERT INTO comercio VALUES(569,'La Pata Loca', 'Av. Moisés Lebensohn 98', 1661 ,46660861);
+					  INSERT INTO comercio VALUES(545,'Frávega', 'Av. Pres. Juan Domingo Perón 1127', 1663 ,44512063);
+					  INSERT INTO comercio VALUES(543,'Spit Bella Vista', 'Av. SenadOR Morón 1452', 1661 ,1153519765);
+					  INSERT INTO comercio VALUES(527,'Óptica Cristal', 'Av. Dr. Ricardo Balbín 1125', 1663 ,46649400);
+					  INSERT INTO comercio VALUES(508,'Óptica Mattaldi', 'Av. Mattaldi 1141', 1661 ,46683911);
+					  INSERT INTO comercio VALUES(509,'Estancia San Francisco San Miguel', 'Concejal Tribulato 1265', 1663 ,5446676082);
+					  INSERT INTO comercio VALUES(500,'Rabelia heladería', 'San José 972', 1663 ,46649352);
+					  INSERT INTO comercio VALUES(520,'Heladería Ciwe', 'San José 785', 1663 ,46646003);
+					  INSERT INTO comercio VALUES(588,'Rever Pass', 'Paunero 1447,', 1663 ,44513921);
+					  INSERT INTO comercio VALUES(582,'Rapsodia', 'Av. Pres. Arturo Umberto Illia 3770', 1663 ,1160911581);
+					  INSERT INTO comercio VALUES(530,'Grimoldi', 'Paunero 1415', 1663 ,44517343);
+					  INSERT INTO comercio VALUES(596,'Umma', 'Paunero 1476', 1663 ,44519267);
+					  INSERT INTO comercio VALUES(538,'COTO', 'Ohiggins 1280', 1661 ,46682636);
+					  INSERT INTO comercio VALUES(553,'Disco', 'Av. SenadOR Morón 960', 1661 ,08107778888);
 
-					  insert into tarjeta values(4000001234567899,11348773, 201508, 202008, 733 ,50000,'vigente');
-					  insert into tarjeta values(4037001554363655,12349972, 201507, 202007, 332 ,55000,'vigente');
-					  insert into tarjeta values(4000001355435322,22648991, 201507, 202007, 201 ,60000,'vigente');
-					  insert into tarjeta values(4032011233774494,11341003, 201509, 202009, 204 ,120000,'vigente');
-					  insert into tarjeta values(4035055234867402,51558783, 201510, 202010, 108 ,150000,'vigente');
-					  insert into tarjeta values(4060001234507040,21347800, 201510, 202010, 909 ,110000,'vigente');
-					  insert into tarjeta values(4040071730767070,11448979, 201704, 202204, 810 ,57000,'vigente');
-					  insert into tarjeta values(4032002224865843,44349773, 201704, 202204, 327 ,64000,'suspendida');
-					  insert into tarjeta values(4034006634262869,33348679, 201708, 202208, 097 ,100000,'suspendida');
-					  insert into tarjeta values(4034001232557669,25348533, 201708, 202208, 653 ,140000,'suspendida');
-					  insert into tarjeta values(4032002134557009,12228777, 201801, 202301, 070 ,150000,'vigente');
-					  insert into tarjeta values(4033002233062344,32680014, 201801, 202301, 202,90000,'anulada');
-					  insert into tarjeta values(4000006877865030,21545800, 201801, 202301, 115 ,80000,'vigente');
-					  insert into tarjeta values(4000001223567822,23679022, 201604, 202104, 559 ,70000,'vigente');
-					  insert into tarjeta values(4000001244532899,12795452, 201604, 202104, 842 ,59000,'vigente');
-					  insert into tarjeta values(4032003238867044,11732790, 201602, 202102, 379 ,73000,'vigente');
-					  insert into tarjeta values(4000002440217199,29546643, 201601, 202101, 794 ,62000,'vigente');
-					  insert into tarjeta values(4032000435566909,18397552, 201701, 202201, 621 ,59000,'suspendida');
-					  insert into tarjeta values(4037055274760805,13348765, 201712, 202212, 109 ,69000,'anulada');
-					  insert into tarjeta values(4000632234361811,13348765, 201709, 202209, 195 ,53000,'suspendida');
-					  insert into tarjeta values(4000000203465800,14348789, 201808, 202308, 290 ,78000,'anulada');
-					  insert into tarjeta values(4003300224374894,14348789, 201809, 202309, 284 ,84000,'anulada');
+					  INSERT INTO tarjeta VALUES(4000001234567899,11348773, 201508, 202008, 733 ,50000,'vigente');
+					  INSERT INTO tarjeta VALUES(4037001554363655,12349972, 201507, 202007, 332 ,55000,'vigente');
+					  INSERT INTO tarjeta VALUES(4000001355435322,22648991, 201507, 202007, 201 ,60000,'vigente');
+					  INSERT INTO tarjeta VALUES(4032011233774494,11341003, 201509, 202009, 204 ,120000,'vigente');
+					  INSERT INTO tarjeta VALUES(4035055234867402,51558783, 201510, 202010, 108 ,150000,'vigente');
+					  INSERT INTO tarjeta VALUES(4060001234507040,21347800, 201510, 202010, 909 ,110000,'vigente');
+					  INSERT INTO tarjeta VALUES(4040071730767070,11448979, 201704, 202204, 810 ,57000,'vigente');
+					  INSERT INTO tarjeta VALUES(4032002224865843,44349773, 201704, 202204, 327 ,64000,'suspendida');
+					  INSERT INTO tarjeta VALUES(4034006634262869,33348679, 201708, 202208, 097 ,100000,'suspendida');
+					  INSERT INTO tarjeta VALUES(4034001232557669,25348533, 201708, 202208, 653 ,140000,'suspendida');
+					  INSERT INTO tarjeta VALUES(4032002134557009,12228777, 201801, 202301, 070 ,150000,'vigente');
+					  INSERT INTO tarjeta VALUES(4033002233062344,32680014, 201801, 202301, 202,90000,'anulada');
+					  INSERT INTO tarjeta VALUES(4000006877865030,21545800, 201801, 202301, 115 ,80000,'vigente');
+					  INSERT INTO tarjeta VALUES(4000001223567822,23679022, 201604, 202104, 559 ,70000,'vigente');
+					  INSERT INTO tarjeta VALUES(4000001244532899,12795452, 201604, 202104, 842 ,59000,'vigente');
+					  INSERT INTO tarjeta VALUES(4032003238867044,11732790, 201602, 202102, 379 ,73000,'vigente');
+					  INSERT INTO tarjeta VALUES(4000002440217199,29546643, 201601, 202101, 794 ,62000,'vigente');
+					  INSERT INTO tarjeta VALUES(4032000435566909,18397552, 201701, 202201, 621 ,59000,'suspendida');
+					  INSERT INTO tarjeta VALUES(4037055274760805,13348765, 201712, 202212, 109 ,69000,'anulada');
+					  INSERT INTO tarjeta VALUES(4000632234361811,13348765, 201709, 202209, 195 ,53000,'suspendida');
+					  INSERT INTO tarjeta VALUES(4000000203465800,14348789, 201808, 202308, 290 ,78000,'anulada');
+					  INSERT INTO tarjeta VALUES(4003300224374894,14348789, 201809, 202309, 284 ,84000,'anulada');
 
 					  `)
 	logErr(err)
@@ -244,50 +244,50 @@ func _generarCierres() {
 	generarCierres()
 
 	_, err = db.Query(
-		`select generarCierres(2020);`)
+		`SELECT generarCierres(2020);`)
 	logErr(err)
 }
 
 func generarCierres() {
 	_, err = db.Query(
 		`
-		create or replace function generarCierres(año int)returns void as $$
-		declare
+		CREATE OR REPLACE FUNCTION generarCierres(año int)returns void as $$
+		DECLARE
 		  fechainicio text;
 		  fechafin text;
 		  fechavto text;
 		  _mes int;
-		begin
-		for terminacion in 0..9 loop
-			for mes in 1..12 loop
+		BEGIN
+		FOR terminacion in 0..9 LOOP
+			FOR mes in 1..12 LOOP
 				_mes=mes+1;
-				if(mes=12) then
+				if(mes=12) THEN
 					_mes=1;
-				end if;
-				if(mes<10 and _mes<10) then
-					fechainicio=concat(cast(año as text),'0',cast(mes as text),'01');
-					fechafin=concat(cast(año as text),'0',cast(_mes as text),'01');
-					fechavto=concat(cast(año as text),'0',cast(_mes as text),'15');
-				end if;
-				if(mes>=10 and _mes>=10) then
-					fechainicio=concat(cast(año as text),cast(mes as text),'01');
-					fechafin=concat(cast(año as text),cast(_mes as text),'01');
-					fechavto=concat(cast(año as text),cast(_mes as text),'15');
-				end if;
-				if(mes>=10 and _mes<10) then
-					fechainicio=concat(cast(año as text),cast(mes as text),'01');
-					fechafin=concat(cast(año as text),cast(_mes as text),'01');
-					fechavto=concat(cast(año as text),'0',cast(_mes as text),'15');
-				end if;
+				END IF;
+				if(mes<10 and _mes<10) THEN
+					fechainicio=concat(CAST(año as text),'0',CAST(mes as text),'01');
+					fechafin=concat(CAST(año as text),'0',CAST(_mes as text),'01');
+					fechavto=concat(CAST(año as text),'0',CAST(_mes as text),'15');
+				END IF;
+				if(mes>=10 and _mes>=10) THEN
+					fechainicio=concat(CAST(año as text),CAST(mes as text),'01');
+					fechafin=concat(CAST(año as text),CAST(_mes as text),'01');
+					fechavto=concat(CAST(año as text),CAST(_mes as text),'15');
+				END IF;
+				if(mes>=10 and _mes<10) THEN
+					fechainicio=concat(CAST(año as text),CAST(mes as text),'01');
+					fechafin=concat(CAST(año as text),CAST(_mes as text),'01');
+					fechavto=concat(CAST(año as text),'0',CAST(_mes as text),'15');
+				END IF;
 
-				insert into cierre values(año, mes, terminacion, to_date(fechainicio,'YYYYMMDD'), to_date(fechafin,'YYYYMMDD'), to_date(fechavto,'YYYYMMDD'));
+				INSERT INTO cierre VALUES(año, mes, terminacion, TO_DATE(fechainicio,'YYYYMMDD'), TO_DATE(fechafin,'YYYYMMDD'), TO_DATE(fechavto,'YYYYMMDD'));
 
-			end loop;
-		end loop;
+			END LOOP;
+		END LOOP;
 
-		end;
+		END;
 
-		$$ language plpgsql;`)
+		$$ LANGUAGE PLPGSQL;`)
 
 	logErr(err)
 }
@@ -296,69 +296,69 @@ func autorizarCompra() {
 	agregarRechazo()
 
 	_, err = db.Query(
-		`create or replace function autorizarcompra(_nrotarjeta char(16),_codseguridad char(4),_nrocomercio int, _monto decimal(7,2)) returns bool as $$
-		 declare
+		`CREATE OR REPLACE FUNCTION autorizarcompra(_nrotarjeta char(16),_codseguridad char(4),_nrocomercio int, _monto decimal(7,2)) returns bool as $$
+		 DECLARE
 			totalpendiente decimal(8,2);
 			montomaximo decimal(8,2);
 			fechaVenceTarjeta int;
 			fechaVence date;
 
-		 begin
+		 BEGIN
 
-			perform * from tarjeta where nrotarjeta=_nrotarjeta and estado='suspendida';
+			PERFORM * FROM tarjeta WHERE nrotarjeta=_nrotarjeta and estado='suspendida';
 
-			if (found) then
-				perform agregarrechazo(cast(_nrotarjeta as char(16)),cast(_nrocomercio as int),cast(current_timestamp as timestamp),cast(_monto as decimal(7,2)),cast('La tarjeta se encuentra suspendida' as text));
+			if (found) THEN
+				PERFORM agregarrechazo(CAST(_nrotarjeta as char(16)),CAST(_nrocomercio as int),CAST(current_timestamp as timestamp),CAST(_monto as decimal(7,2)),CAST('La tarjeta se encuentra suspendida' as text));
 				return False;
-			end if;
+			END IF;
 
-			perform * from tarjeta where nrotarjeta=_nrotarjeta and estado='vigente';
+			PERFORM * FROM tarjeta WHERE nrotarjeta=_nrotarjeta and estado='vigente';
 
-			if (not found) then
-				perform agregarrechazo(cast(_nrotarjeta as char(16)),cast(_nrocomercio as int),cast(current_timestamp as timestamp),cast(_monto as decimal(7,2)),cast('Tarjeta no válida' as text));
+			if (not found) THEN
+				PERFORM agregarrechazo(CAST(_nrotarjeta as char(16)),CAST(_nrocomercio as int),CAST(current_timestamp as timestamp),CAST(_monto as decimal(7,2)),CAST('Tarjeta no válida' as text));
 				return False;
-			end if;
+			END IF;
 
-			perform * from tarjeta where nrotarjeta=_nrotarjeta and codseguridad=_codseguridad;
+			PERFORM * FROM tarjeta WHERE nrotarjeta=_nrotarjeta and codseguridad=_codseguridad;
 
-			if (not found) then
-				perform agregarrechazo(cast(_nrotarjeta as char(16)),cast(_nrocomercio as int),cast(current_timestamp as timestamp),cast(_monto as decimal(7,2)),cast('Número de seguridad inválido' as text));
+			if (not found) THEN
+				PERFORM agregarrechazo(CAST(_nrotarjeta as char(16)),CAST(_nrocomercio as int),CAST(current_timestamp as timestamp),CAST(_monto as decimal(7,2)),CAST('Número de seguridad inválido' as text));
 				return False;
-			end if;
+			END IF;
 
-			totalpendiente:= (select sum(monto) from compra where nrotarjeta =_nrotarjeta and pagado=False);
-			montomaximo:= (select limitecompra from tarjeta where nrotarjeta=_nrotarjeta);
+			totalpendiente:= (SELECT sum(monto) FROM compra WHERE nrotarjeta =_nrotarjeta and pagado=False);
+			montomaximo:= (SELECT limitecompra FROM tarjeta WHERE nrotarjeta=_nrotarjeta);
 
-			if(totalpendiente is null and _monto > montomaximo or totalpendiente is not null and totalpendiente + _monto>montomaximo) then
-				perform agregarrechazo(cast(_nrotarjeta as char(16)),cast(_nrocomercio as int),cast(current_timestamp as timestamp),cast(_monto as decimal(7,2)),cast('Supera límite de tarjeta' as text));
+			if(totalpendiente is null and _monto > montomaximo OR totalpendiente is not null and totalpendiente + _monto>montomaximo) THEN
+				PERFORM agregarrechazo(CAST(_nrotarjeta as char(16)),CAST(_nrocomercio as int),CAST(current_timestamp as timestamp),CAST(_monto as decimal(7,2)),CAST('Supera límite de tarjeta' as text));
 				return False;
-			end if;
+			END IF;
 
-			select validahasta into fechaVenceTarjeta from tarjeta where nrotarjeta=_nrotarjeta;
+			SELECT validahasta INTO fechaVenceTarjeta FROM tarjeta WHERE nrotarjeta=_nrotarjeta;
 
-			select into FechaVence to_date(fechaVenceTarjeta ||'01','YYYYMMDD');
-			select into FechaVence (FechaVence +  interval '1 month')::date;
+			SELECT INTO FechaVence TO_DATE(fechaVenceTarjeta ||'01','YYYYMMDD');
+			SELECT INTO FechaVence (FechaVence +  interval '1 month')::date;
 
-			if (FechaVence < current_date) then
-			perform agregarrechazo(cast(_nrotarjeta as char(16)),cast(_nrocomercio as int),cast(current_timestamp as timestamp),cast(_monto as decimal(7,2)),cast('Plazo de vigencia expirado' as text));
+			if (FechaVence < current_date) THEN
+			PERFORM agregarrechazo(CAST(_nrotarjeta as char(16)),CAST(_nrocomercio as int),CAST(current_timestamp as timestamp),CAST(_monto as decimal(7,2)),CAST('Plazo de vigencia expirado' as text));
 				return False;
-			end if;
+			END IF;
 
-			insert into compra(nrotarjeta, nrocomercio, fecha, monto, pagado) values( _nrotarjeta, _nrocomercio, current_timestamp, _monto,False);
+			INSERT INTO compra(nrotarjeta, nrocomercio, fecha, monto, pagado) VALUES( _nrotarjeta, _nrocomercio, current_timestamp, _monto,False);
 			return True;
 
-		end;
-	$$ language plpgsql;`)
+		END;
+	$$ LANGUAGE PLPGSQL;`)
 	logErr(err)
 }
 
 func GenerarLogicaConsumo() {
 	autorizarCompra()
-	generarConsumo()	
-	crearTriggerConsumo()	
+	generarConsumo()
+	crearTriggerConsumo()
 }
 
-func GenerarLogicaAlertas(){
+func GenerarLogicaAlertas() {
 	crearTriggerRechazo()
 	crearTriggersSeguridad()
 }
@@ -366,23 +366,23 @@ func GenerarLogicaAlertas(){
 func generarConsumo() {
 	_, err = db.Query(
 		`
-		create or replace function generarConsumo(cantidad int)returns void as $$
-		declare
+		CREATE OR REPLACE FUNCTION generarConsumo(cantidad int)returns void as $$
+		DECLARE
 		  tarjetaAleatoria record;
 		  comercioAleatorio int;
 		  montoAleatorio decimal(7,2);
-		begin
+		BEGIN
 
-		for _consumo in 0..cantidad-1 loop
+		FOR _consumo in 0..cantidad-1 LOOP
 			montoAleatorio = 999 + random()*99000;
-			perform trunc(montoAleatorio,2);
-			select into comercioAleatorio nrocomercio from comercio order by random() limit 1;
-			select into tarjetaAleatoria * from tarjeta order by random() limit 1;
-			insert into consumo values(tarjetaAleatoria.nrotarjeta, tarjetaAleatoria.codseguridad, comercioAleatorio, cast(montoAleatorio as decimal(7,2)));
-		end loop;
-		end;
+			PERFORM TRUNC(montoAleatorio,2);
+			SELECT INTO comercioAleatorio nrocomercio FROM comercio ORDER BY random() LIMIT 1;
+			SELECT INTO tarjetaAleatoria * FROM tarjeta ORDER BY random() LIMIT 1;
+			INSERT INTO consumo VALUES(tarjetaAleatoria.nrotarjeta, tarjetaAleatoria.codseguridad, comercioAleatorio, CAST(montoAleatorio as decimal(7,2)));
+		END LOOP;
+		END;
 
-		$$ language plpgsql;`)
+		$$ LANGUAGE PLPGSQL;`)
 	logErr(err)
 }
 
@@ -390,11 +390,11 @@ func crearTriggerConsumo() {
 	agregarTestConsumo()
 
 	_, err = db.Query(
-		`create trigger agregarconsumo_trg
-		before insert on consumo
+		`CREATE trigger agregarconsumo_trg
+		BEFORE INSERT ON consumo
 
-		for each row
-			execute procedure testear_consumo();
+		FOR EACH ROW
+			EXECUTE PROCEDURE testear_consumo();
 
 		`)
 	logErr(err)
@@ -402,49 +402,49 @@ func crearTriggerConsumo() {
 
 func agregarTestConsumo() {
 	_, err = db.Query(
-		`create or replace function testear_consumo() returns trigger as $$
-		begin
+		`CREATE OR REPLACE FUNCTION testear_consumo() returns trigger as $$
+		BEGIN
 		
-		perform autorizarcompra(new.nrotarjeta,new.codseguridad, new.nrocomercio, new.monto);
+		PERFORM autorizarcompra(new.nrotarjeta,new.codseguridad, new.nrocomercio, new.monto);
 		return new;
-		end;
+		END;
 
-	$$ language plpgsql;`)
+	$$ LANGUAGE PLPGSQL;`)
 	logErr(err)
 }
 
 func agregarRechazo() {
 	chequearRechazoLimites()
 	_, err = db.Query(
-		`create or replace function agregarrechazo(_nrotarjeta char(16),_nrocomercio int, _fecha timestamp,_monto decimal(7,2),_motivo text) returns void as $$
-		declare
+		`CREATE OR REPLACE FUNCTION agregarrechazo(_nrotarjeta char(16),_nrocomercio int, _fecha timestamp,_monto decimal(7,2),_motivo text) returns void as $$
+		DECLARE
 			numerorechazo int;
 
-		begin
+		BEGIN
 
-		insert into rechazo(nrotarjeta, nrocomercio, fecha, monto, motivo) values( _nrotarjeta, _nrocomercio, current_timestamp, _monto, _motivo)
+		INSERT INTO rechazo(nrotarjeta, nrocomercio, fecha, monto, motivo) VALUES( _nrotarjeta, _nrocomercio, current_timestamp, _monto, _motivo)
 		RETURNING nrorechazo INTO numerorechazo;
 
-		--mover insert rechazo
-		perform ChequearRechazoLimites(numerorechazo);
+		--mover INSERT rechazo
+		PERFORM ChequearRechazoLimites(numerorechazo);
 
-		end;
+		END;
 
-	$$ language plpgsql;`)
+	$$ LANGUAGE PLPGSQL;`)
 	logErr(err)
 }
 
 func agregarAlertaRechazo() {
 	_, err = db.Query(
-		`create or replace function agregar_alerta() returns trigger as $$
-		begin
+		`CREATE OR REPLACE FUNCTION agregar_alerta() returns trigger as $$
+		BEGIN
 
-		insert into alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion) values(new.nrotarjeta, new.fecha, new.nrorechazo, 0 , new.motivo);
+		INSERT INTO alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion) VALUES(new.nrotarjeta, new.fecha, new.nrorechazo, 0 , new.motivo);
 
 		return new;
-		end;
+		END;
 
-	$$ language plpgsql;`)
+	$$ LANGUAGE PLPGSQL;`)
 	logErr(err)
 }
 
@@ -452,11 +452,11 @@ func crearTriggerRechazo() {
 	agregarAlertaRechazo()
 
 	_, err = db.Query(
-		`create trigger agregarrechazo_trg
-		before insert on rechazo
+		`CREATE trigger agregarrechazo_trg
+		BEFORE INSERT ON rechazo
 
-		for each row
-			execute procedure agregar_alerta();
+		FOR EACH ROW
+			EXECUTE PROCEDURE agregar_alerta();
 
 		`)
 	logErr(err)
@@ -464,61 +464,61 @@ func crearTriggerRechazo() {
 func crearTriggersSeguridad() {
 	seguridadCompras()
 	_, err = db.Query(
-		`create trigger compras_lapso_tiempo
-		before insert on compra
+		`CREATE trigger compras_lapso_tiempo
+		BEFORE INSERT ON compra
 
-		for each row
-			execute procedure compras_lapso_tiempo();
+		FOR EACH ROW
+			EXECUTE PROCEDURE compras_lapso_tiempo();
 		`)
 	logErr(err)
 }
 
 func seguridadCompras() {
 	_, err = db.Query(
-		`create or replace function compras_lapso_tiempo() returns trigger as $$
-		declare
+		`CREATE OR REPLACE FUNCTION compras_lapso_tiempo() returns trigger as $$
+		DECLARE
 			ultimaCompra record;
 			difTimestamps decimal;
-			codPostalAnterior int;
+			codPostalAnteriOR int;
 			codPostalActual int;
-		begin
-			select * into ultimaCompra from compra where nrotarjeta = new.nrotarjeta order by nrooperacion desc limit 1;
+		BEGIN
+			SELECT * INTO ultimaCompra FROM compra WHERE nrotarjeta = new.nrotarjeta ORDER BY nrooperacion DESC LIMIT 1;
 
-			if(not found) then
+			if(not found) THEN
 				return new;
-			end if;
+			END IF;
 
-			select into difTimestamps extract(epoch from new.fecha - ultimaCompra.fecha) / 60;
+			SELECT INTO difTimestamps EXTRACT(EPOCH FROM new.fecha - ultimaCompra.fecha) / 60;
 
-			select codigopostal into codPostalAnterior from comercio where nrocomercio = ultimaCompra.nrocomercio;
-			select codigopostal into codPostalActual from comercio where nrocomercio = new.nrocomercio;
+			SELECT codigopostal INTO codPostalAnteriOR FROM comercio WHERE nrocomercio = ultimaCompra.nrocomercio;
+			SELECT codigopostal INTO codPostalActual FROM comercio WHERE nrocomercio = new.nrocomercio;
 
-			if(difTimestamps < 1 and ultimaCompra.nrocomercio != new.nrocomercio and codPostalAnterior = codPostalActual) then
-				insert into alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion) values(new.nrotarjeta, new.fecha, -1, 1 , 'Compra en menos de 1 minuto en una misma zona');
+			if(difTimestamps < 1 and ultimaCompra.nrocomercio != new.nrocomercio and codPostalAnteriOR = codPostalActual) THEN
+				INSERT INTO alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion) VALUES(new.nrotarjeta, new.fecha, -1, 1 , 'Compra en menos de 1 minuto en una misma zona');
 				return new;
-			end if;
+			END IF;
 
-			if(difTimestamps < 5 and ultimaCompra.nrocomercio != new.nrocomercio and codPostalAnterior != codPostalActual) then
-				insert into alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion) values(new.nrotarjeta, new.fecha, -1, 5 , 'Compra en menos de 5 minutos en diferentes zonas');
+			if(difTimestamps < 5 and ultimaCompra.nrocomercio != new.nrocomercio and codPostalAnteriOR != codPostalActual) THEN
+				INSERT INTO alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion) VALUES(new.nrotarjeta, new.fecha, -1, 5 , 'Compra en menos de 5 minutos en diferentes zonas');
 				return new;
-			end if;
+			END IF;
 
 			return new;
-			end;
-		$$ language plpgsql;
+		END;
+		$$ LANGUAGE PLPGSQL;
 	`)
 	logErr(err)
 }
 
 func GenerarResumen() {
 	_, err = db.Query(
-		`create or replace function generarResumen(cliente int, anioR int, mesR int) returns bool as $$
-		declare
+		`CREATE OR REPLACE FUNCTION generarResumen(cliente int, aniOR int, mesR int) returns bool as $$
+		DECLARE
 			   idResumen int;
 			   totalPagar decimal(8,2) := 0;
 			   _linea record;
 				
-		begin
+		BEGIN
 		-- 	Generar Cabecera
 		INSERT INTO cabecera (nombre, apellido, domicilio, nrotarjeta, desde, hasta, vence)
 		SELECT cli.nombre, cli.apellido, cli.domicilio, t.nrotarjeta, c.fechainicio, c.fechacierre, c.fechavto
@@ -533,7 +533,7 @@ func GenerarResumen() {
 		if (idResumen is null) then
 					raise 'No se pudo generar el resumen, Cliente inexistente';
 					return False;
-		end if;
+		END IF;
 
 		-- Generar detalle
 		INSERT INTO detalle (nroresumen, nrolinea, fecha, nombrecomercio, monto)
@@ -551,7 +551,7 @@ func GenerarResumen() {
 		if (lastval() is NULL) then
 				raise 'No se pudo generar el resumen';
 				return False;
-		end if;
+		END IF;
 
 		-- Actualizar Resumen
 		totalPagar := (SELECT SUM(monto)
@@ -559,7 +559,7 @@ func GenerarResumen() {
 							  WHERE nroresumen = idResumen
 							  GROUP BY nroresumen);
 		UPDATE cabecera
-			set total = totalPagar WHERE nroresumen = idResumen;
+			SET total = totalPagar WHERE nroresumen = idResumen;
 
 		--Cambiar pagado a True
 		for _linea in SELECT * FROM public.tarjeta t, public.cierre c, public.compra co, public.comercio com
@@ -570,44 +570,44 @@ func GenerarResumen() {
 
 					UPDATE compra set pagado = True where nrotarjeta=_linea.nrotarjeta and monto=_linea.monto;				
 				
-		end loop;	
+		END LOOP;	
 				
 		return True;
 
-		end;
-		$$ language plpgsql;`)
+		END;
+		$$ LANGUAGE PLPGSQL;`)
 	logErr(err)
 }
 
 func chequearRechazoLimites() {
 	_, err = db.Query(
-		`create or replace function ChequearRechazoLimites(numeroR int) returns void as $$
-		Declare
+		`CREATE OR REPLACE FUNCTION ChequearRechazoLimites(numerOR int) returns void as $$
+		DECLARE
 			tarjetaR char(16);
 			fechaR timestamp;
-		begin
+		BEGIN
 
-			SELECT nrotarjeta, fecha INTO tarjetaR, fechaR FROM rechazo where nrorechazo = numeroR;
+			SELECT nrotarjeta, fecha INTO tarjetaR, fechaR FROM rechazo WHERE nrorechazo = numeroR;
 
-			perform nrotarjeta
-			from rechazo
-			where nrotarjeta = tarjetaR
+			PERFORM nrotarjeta
+			FROM rechazo
+			WHERE nrotarjeta = tarjetaR
 			and fecha = fechaR
 			and motivo = 'Supera límite de tarjeta'
-			group by nrotarjeta
-			having count(*) > 1;
+			GROUP BY nrotarjeta
+			HAVING COUNT(*) > 1;
 
-			if (found) then
-				insert into alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion)
-				values (tarjetaR, fechaR, numeroR, 32, 'Tarjeta suspendida');
+			if (found) THEN
+				INSERT INTO alerta(nrotarjeta,fecha,nrorechazo,codalerta,descripcion)
+				VALUES (tarjetaR, fechaR, numeroR, 32, 'Tarjeta suspendida');
 
-				update tarjeta
-				Set estado = 'suspendida'
-				where nroTarjeta = tarjetaR;
-			end if;
+				UPDATE tarjeta
+				SET estado = 'suspendida'
+				WHERE nroTarjeta = tarjetaR;
+			END IF;
 
-		end;
-		$$ language plpgsql;
+		END;
+		$$ LANGUAGE PLPGSQL;
 		`)
 	logErr(err)
 }
