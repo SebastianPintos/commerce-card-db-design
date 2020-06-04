@@ -39,31 +39,31 @@ func mostrarMenu() {
 func manejarOpciones(opcion int) bool {
 	switch {
 	case opcion == 1:
-		sql.crearDB()
+		sql.CrearDB()
 		fmt.Println("Base de datos creada")
 	case opcion == 2:
-		sql.crearTablas()
+		sql.CrearTablas()
 		fmt.Println("Tablas creadas")
 	case opcion == 3:
-		sql.crearPKyFK()
+		sql.CrearPKyFK()
 		fmt.Println("PK's & FK's creadas")
 	case opcion == 4:
-		sql.eliminarPKyFK()
+		sql.EliminarPKyFK()
 		fmt.Println("PK's & FK's borradas")
 	case opcion == 5:
-		sql.cargarDB()
+		sql.CargarDB()
 		fmt.Println("Todos los datos cargados")
 	case opcion == 6:
-		sql.generarLogicaConsumo()
+		sql.GenerarLogicaConsumo()
 		fmt.Println("Función creada")
 	case opcion == 7:
-		sql.generarLogicaAlertas()
+		sql.GenerarLogicaAlertas()
 		fmt.Println("Se agregó lógica de alertas")
 	case opcion == 8:
 		noSQL.CargaDatosNoDB()
 		fmt.Println("Todos los datos noSQL DB cargados")
 	case opcion == 9:
-		sql.generarResumen()
+		sql.GenerarResumen()
 		fmt.Println("Resumenes Generados")
 	case opcion == 10:
 		return false

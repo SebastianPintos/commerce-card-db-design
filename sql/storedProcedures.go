@@ -260,7 +260,7 @@ func spTestearConsumo() {
 	logErr(err)
 }
 
-func spAgregarAlerta() {
+func spAgregarAlertaRechazo() {
 	_, err = db.Query(
 		`CREATE OR REPLACE FUNCTION agregar_alerta() returns trigger as $$
 		BEGIN
