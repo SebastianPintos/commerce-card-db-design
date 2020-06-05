@@ -174,7 +174,7 @@ func spAutorizarCompra() {
 			PERFORM * FROM tarjeta WHERE nrotarjeta=_nrotarjeta and codseguridad=_codseguridad;
 
 			if (not found) THEN
-				PERFORM agregarrechazo(CAST(_nrotarjeta as char(16)),CAST(_nrocomercio as int),CAST(current_timestamp as timestamp),CAST(_monto as decimal(7,2)),CAST('Número de seguridad inválido' as text));
+				PERFORM agregarrechazo(CAST(_nrotarjeta as char(16)),CAST(_nrocomercio as int),CAST(current_timestamp as timestamp),CAST(_monto as decimal(7,2)),CAST('Código de seguridad inválido' as text));
 				return False;
 			END IF;
 
@@ -224,7 +224,7 @@ func spAgregarRechazo() {
 	logErr(err)
 }
 
-func spGenerarConsumo() {
+/*func spGenerarConsumo() {
 	_, err = db.Query(
 		`
 		CREATE OR REPLACE FUNCTION generarConsumo(cantidad int)returns void as $$
@@ -245,7 +245,7 @@ func spGenerarConsumo() {
 
 		$$ LANGUAGE PLPGSQL;`)
 	logErr(err)
-}
+}*/
 
 func spTestearConsumo() {
 	_, err = db.Query(

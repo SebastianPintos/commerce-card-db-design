@@ -1,6 +1,6 @@
 package sql
 
-func TestearConsumo(){
+func TestearConsumo() {
 	consumoValidoTest()
 	consumoTarjetaInvalidaTest()
 	consumoCodSeguridadInvalidoTest()
@@ -11,6 +11,7 @@ func TestearConsumo(){
 	consumoAlerta5Test()
 	consumoAlerta32Test()
 
+	/*Para ejecutar todos los test
 	_, err = db.Query(
 	`   SELECT consumoValidoTest(),
 		consumoTarjetaInvalidaTest(),
@@ -22,11 +23,11 @@ func TestearConsumo(){
 		consumoAlerta5Test(),
 		consumoAlerta32Test();
 		`)
-	logErr(err)
+	logErr(err)*/
 }
 
-func consumoValidoTest(){
-	
+func consumoValidoTest() {
+
 	_, err = db.Query(
 		`CREATE OR REPLACE FUNCTION consumoValidoTest()returns boolean as $$
 		DECLARE
@@ -46,7 +47,7 @@ func consumoValidoTest(){
 		END;
 		$$ LANGUAGE PLPGSQL;`)
 	logErr(err)
-	
+
 }
 
 func consumoTarjetaInvalidaTest() {
@@ -76,7 +77,6 @@ func consumoTarjetaInvalidaTest() {
 	logErr(err)
 }
 
-
 func consumoCodSeguridadInvalidoTest() {
 	_, err = db.Query(
 		`CREATE OR REPLACE FUNCTION consumoCodSeguridadInvalidoTest()returns boolean as $$
@@ -95,7 +95,7 @@ func consumoCodSeguridadInvalidoTest() {
 		END IF;
 
 
-		raise notice 'Test consumo tarjeta inválida y alerta rechazo: False';
+		raise notice 'Test consumo código de seguridad inválido y alerta rechazo: False';
 		return False;
 		END;
 		$$ LANGUAGE PLPGSQL;
@@ -103,7 +103,6 @@ func consumoCodSeguridadInvalidoTest() {
 		`)
 	logErr(err)
 }
-
 
 func consumoExcedeLimiteTest() {
 	_, err = db.Query(
@@ -113,9 +112,9 @@ func consumoExcedeLimiteTest() {
 		cantidad int;
 
 		BEGIN
-		INSERT INTO consumo VALUES(4000001234567899,733,520,99999);
+		INSERT INTO consumo VALUES(4000006877865030,115,520,99999);
 		SELECT INTO cantidad COUNT(*) FROM rechazo, alerta WHERE alerta.nrotarjeta = '4000001234567899' 
-		AND rechazo.nrotarjeta = '4000001234567899' 
+		AND rechazo.nrotarjeta = '4000006877865030' 
 		AND motivo='Supera límite de tarjeta' AND codalerta = 0;
 		
 		if(cantidad = 1) THEN
@@ -133,7 +132,6 @@ func consumoExcedeLimiteTest() {
 		`)
 	logErr(err)
 }
-
 
 func consumoTarjetaExpiradaTest() {
 	_, err = db.Query(
@@ -162,7 +160,6 @@ func consumoTarjetaExpiradaTest() {
 	`)
 	logErr(err)
 }
-
 
 func consumoTarjetaSuspendidaTest() {
 	_, err = db.Query(

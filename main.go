@@ -30,12 +30,11 @@ func mostrarMenu() {
 	fmt.Println("3) Crear PK's & FK's")
 	fmt.Println("4) Borrar PK's & FK's")
 	fmt.Println("5) Cargar todos los datos")
-	fmt.Println("6) Agregar lógica de consumo virtual")
-	fmt.Println("7) Agregar lógica de alertas")
-	fmt.Println("8) Ejecutar test de consumo")
-	fmt.Println("9) Cargar Datos noSql en BoltDB")
-	fmt.Println("10) Generar Resumenes")
-	fmt.Println("11) Salir ")
+	fmt.Println("6) Agregar lógica de consumo virtual y alertas")
+	fmt.Println("7) Ejecutar test de consumo")
+	fmt.Println("8) Cargar Datos noSql en BoltDB")
+	fmt.Println("9) Generar Resumenes")
+	fmt.Println("10) Salir ")
 }
 func manejarOpciones(opcion int) bool {
 	switch {
@@ -52,24 +51,21 @@ func manejarOpciones(opcion int) bool {
 		sql.EliminarPKyFK()
 		fmt.Println("PK's & FK's borradas")
 	case opcion == 5:
-		sql.CargarDatos()
+		sql.CargarDB()
 		fmt.Println("Todos los datos cargados")
 	case opcion == 6:
 		sql.GenerarLogicaConsumo()
-		fmt.Println("Función creada")
+		fmt.Println("Se agregó lógica de consumo y alertas")
 	case opcion == 7:
-		sql.GenerarLogicaAlertas()
-		fmt.Println("Se agregó lógica de alertas")
-	case opcion == 8:
 		sql.TestearConsumo()
 		fmt.Println("Test de consumo ejecutados")
-	case opcion == 9:
+	case opcion == 8:
 		noSQL.CargaDatosNoDB()
 		fmt.Println("Todos los datos noSQL DB cargados")
-	case opcion == 10:
+	case opcion == 9:
 		sql.GenerarResumen()
 		fmt.Println("Resumenes Generados")
-	case opcion == 11:
+	case opcion == 10:
 		return false
 	default:
 		fmt.Println("Ingrese un numero valido")

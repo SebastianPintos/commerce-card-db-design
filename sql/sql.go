@@ -32,43 +32,22 @@ func CrearDB() {
 }
 
 func CargarDB() {
-	CrearTablas()
-	crearSPs()
-	//crearTriggers()
+	CargarDatos()
 }
-
-func crearSPs() {
-	spGenerarCierres()
-	spGenerarResumen()
-}
-
-// func crearTriggers() {
-// 	trAgregarConsumo()
-// 	trAgregarRechazo()
-// 	trSeguridadCompras()
-// }
 
 func GenerarLogicaConsumo() {
-	//autorizarCompra()
-	//generarConsumo()
-	//crearTriggerConsumo()
 	spChequearRechazoLimites()
 	spAgregarRechazo()
 	spAutorizarCompra()
 
-	spGenerarConsumo()
+	spAutorizarCompra()
+
+	spAgregarAlertaRechazo()
+	trAgregarAlerta()
 
 	spTestearConsumo()
 	trAgregarConsumo()
-}
-
-func GenerarLogicaAlertas() {
-	//crearTriggerRechazo()
-	//crearTriggersSeguridad()
-
-	spAgregarAlertaRechazo()
-	trAgregarRechazo()
-
+	
 	spSeguridadCompras()
 	trSeguridadCompras()
 }

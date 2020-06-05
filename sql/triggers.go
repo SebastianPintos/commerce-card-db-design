@@ -12,9 +12,9 @@ func trAgregarConsumo() {
 	logErr(err)
 }
 
-func trAgregarRechazo() {
+func trAgregarAlerta() {
 	_, err = db.Query(
-		`CREATE trigger agregarrechazo_trg
+		`CREATE trigger agregaralerta_trg
 		BEFORE INSERT ON rechazo
 
 		FOR EACH ROW
