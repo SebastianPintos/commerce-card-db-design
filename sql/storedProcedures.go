@@ -310,3 +310,5 @@ func spSeguridadCompras() {
 	`)
 	logErr(err)
 }
+
+

@@ -1,6 +1,6 @@
 package sql
 
-func cargarDatos() {
+func CargarDatos() {
 	_, err = db.Exec(`INSERT INTO cliente VALUES(11348773,'Rocío', 'Losada','Av. Presidente Perón 1530',1151102983);
 					  INSERT INTO cliente VALUES(12349972,'María Estela', 'Martínez','Belgrano 1830',1150006655);
 					  INSERT INTO cliente VALUES(22648991,'Laura', 'Santos','Italia 220',1153399452);
@@ -73,6 +73,7 @@ func cargarDatos() {
 }
 
 func cargarCierres() {
+	spGenerarCierres()
 	_, err = db.Query(`SELECT generarCierres(2020);`)
 	logErr(err)
 }
