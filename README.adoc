@@ -86,7 +86,13 @@ Este código, también deberá ejecutarse desde una aplicación CLI escrita en G
 El programa se organiza en dos carpetas y un archivo escrito en Go (main) que sirve como aplicación CLI:
 
 - Carpeta _sql_:
-* Contiene toda la lógica asociada a los ítems: Creación de la base de datos, Instancia de los datos y _Stored procedures_ o _triggers_. 
+* Contiene toda la lógica asociada a los ítems: Creación de la base de datos, Instancia de los datos y _Stored procedures_ o _triggers_. Se organiza en los siguientes archivos: 
+* consumoTest.go
+* datos.go
+* sql.go
+* storedProcedures.go
+* tablas.go
+* triggers.go
 
 - Carpeta _no-sql_: 
 * Contiene la resolución del ítem _JSON_ y Base de datos _NoSQL_.
@@ -94,27 +100,48 @@ El programa se organiza en dos carpetas y un archivo escrito en Go (main) que si
 Se cambiaron los tipos de datos de: _nrooperacion, nrorechazo, nroresumen_ y _nroalerta_ por _serial_ para facilitar el autoincremento de estos campos.
 
 == Implementación
-- Descripción de los métodos del archivo _sql.go_:
-* _CrearDB()_: Creación de la Base de Datos.
-* _CrearTablas()_: Creación de las tablas especificadas.
-* _CrearPKyFK()_: Utiliza los métodos _crearPK()_ y _crearFK()_ respectivamente.
-* _EliminarPKyFK()_: Utiliza los métodos _eliminarPK()_ y _eliminarFK()_ respectivamente.
-* _CargarDatos()_: Carga la cantidad de datos especificada en las tablas: _cliente_ y _comercio_. Genera los cierres para el año 2020, llamando a _ _generarCierres()._
-* _generarCierres()_: Crea una _stored procedure_ que toma como parámetro el año y genera los cierres para ese año, para cada terminación posible.
-* _generarCierres()_: Invoca a la función anterior para generar los cierres del 2020.
-* _autorizarCompra()_: Crea una _stored procedure_ con parámetros: _nrotarjeta, codseguridad, nrocomercio_, y _monto_. Devuelve _true_ si la compra fue autorizada y _false_ si fue rechazada.
-* _generarConsumo()_: Crea una _stored procedure_ con parámetro: _cantidad_. Genera la cantidad de consumos especificada, obteniendo los datos aleatoriamente de las tablas _comercio_ y _tarjeta_. Genera un _monto_ aleatorio.
-* _crearTriggerConsumo()_: Llama a la función _agregarTestConsumo()_ para crear la función _testear_consumo()_. Crea un _trigger_ que se activa antes de cada _insert_ en la tabla _consumo_. Por cada fila insertada, ejecuta la función _testear_consumo()_.
-* _agregarTestConsumo()_: Crea una _stored procedure_ que llama a la función _autorizarcompra_ con sus respectivos parámetros, con los valores _new_ generados en el _insert_.
-* _GenerarLogicaConsumo()_ :Llama a las funciones: _autorizarCompra, crearTriggerRechazo, crearTriggerConsumo, generarConsumo_. Para generar las _stored procedures_ y _triggers_ relacionados a los consumos virtuales y su testeo. 
-* _agregarRechazo()_: Crea una _stored procedure_ que toma como parámetros: _nrotarjeta, nrocomercio, fecha_ y _motivo_ e inserta esos valores en la tabla _rechazo_. Invoca a la función _ChequearRechazoLimites(nrorechazo)_. 
-* _crearTriggerRechazo()_: Crea un _trigger_ que antes de cada _insert_ en _rechazo_, por cada fila insertada llama a la función _agregar_alerta()_.
-* _agregarAlertaRechazo()_: Crea una _stored procedure agregar_alerta_ que agrega una _alerta_ con los valores a insertar en la tabla _rechazo_. Con _codalerta:_ 0. Correspondiente a alertas generadas por rechazo.
-* _GenerarLogicaAlertas()_: Se encarga de invocar a las funciones _crearTriggerRechazo()_ y _crearTriggerSeguridad()_ para generar los _triggers_ correspondientes.
-* _crearTriggerSeguridad()_: Llama a la función _seguridadCompras_ para crear la función _compras_lapso_tiempo_. Crea un _trigger_ que se activa antes de cada _insert_ en la tabla _compra_. Por cada fila insertada, ejecuta la función _compras_lapso_tiempo()_.
-* _seguridadCompras()_: Es la encargada de crear la función del _trigger_ _compras_lapso_tiempo_. Esta función checkea que las compras en un lapso de tiempo para una tarjeta en diferentes comercios estén dentro del requerimiento solicitado. En caso de detectar dos compras con lapso menor a un minuto ubicadas en el mismo código postal, se deberá insertar una _alerta_ con _codalerta_: 1. En caso de detectar dos compras con lapso menor a 5 minutos con diferentes códigos postales se deberá insertar una nueva _alerta_ con _codalerta_: 5.
-* _chequearRechazoLimites()_: Crea una _stored procedure_ que toma como parámetro: nrorechazo. Detecta si la tarjeta registra dos rechazos por exceso de límite en el mismo día. En ese caso, cambia el _estado_ de la _tarjeta_ a _suspendida_ e inserta una nueva _alerta_ con _codalerta_: 32.
-* _GenerarResumen()_: Crea una _stored procedure_ que toma como parámetros: _nrocliente, año, mes_ y retorna _true_ si se ha podido generar el resumen y _false_ en caso contrario. Para generarlo, se utiliza la terminación de la tarjeta del _cliente_ y se busca el período solicitado con esa terminación en la tabla _cierre_. En caso de poder generar el resumen, marca las compras involucradas como pagadas.
+- Descripción de los métodos del archivo _consumoTest.go_:
+* _consumoValidoTest()_ : Agrega un consumo válido y comprueba que se haya agregado a la tabla compras.
+* _consumoTarjetaInvalidaTest()_ : Agrega un consumo en el que la tarjeta es inválida. Comprueba que se haya agregado el rechazo y la alerta con código 0 (correspondiente a alertas por rechazo). Retorna true si la comprobación es exitosa, false en caso contrario.
+* _ consumoCodSeguridadInvalidoTest()_ : Agrega un consumo en el que el código de seguridad es inválido. Comprueba que se haya agregado el rechazo y la alerta con código 0 (correspondiente a alertas por rechazo). Retorna true si la comprobación es exitosa, false en caso contrario.
+* _consumoExcedeLimiteTest()_ : Agrega un consumo que excede el límite de la tarjeta indicada. Comprueba que se haya agregado el rechazo y la alerta con código 0 (correspondiente a alertas por rechazo). Retorna true si la comprobación es exitosa, false en caso contrario.
+* _consumoTarjetaExpiradaTest()_ : Agrega un consumo en el que la tarjeta está expirada. Comprueba que se haya agregado el rechazo y la alerta con código 0 (correspondiente a alertas por rechazo). Retorna true si la comprobación es exitosa, false en caso contrario.
+* _consumoTarjetaSuspendidaTest()_ : Agrega un consumo en el que la tarjeta está suspendida. Comprueba que se haya agregado el rechazo y la alerta con código 0 (correspondiente a alertas por rechazo). Retorna true si la comprobación es exitosa, false en caso contrario.
+* _consumoAlerta1Test()_ : Agrega dos consumos de una misma tarjeta en comercios distintos ubicados en el mismo código postal, donde la tarjeta es válida y el monto es suficiente. Comprueba que se haya agregado la alerta con código 1 correspondiente a compras con esas características realizadas en un lapso menor a un minuto. Retorna true si la comprobación es exitosa, false en caso contrario.
+* _consumoAlerta5Test()_ : Agrega dos consumos de una misma tarjeta en comercios, donde la tarjeta es válida y el monto es suficiente. Comprueba que se haya agregado la alerta con código 5 correspondiente a compras con esas características en un lapso menor a 5 minutos. Retorna true si la comprobación es exitosa, false en caso contrario.
+* _consumoAlerta32Test()_ : Agrega dos consumos de una misma tarjeta los cuales exceden los límites de la misma. Esto, genera dos rechazos por exceso de límite de tarjeta.  Comprueba que se haya agregado la alerta con código 32 asociada a tarjetas que tienen dos rechazos por exceso de límite en un mismo día. Retorna true si la comprobación es exitosa, false en caso contrario.
+- Descripción de los métodos del archivo _datos.go_ :
+* _cargarDatos()_ : Carga la cantidad de datos especificada en las tablas: _cliente_ , _comercio_ y _tarjeta_. Genera los cierres para el año 2020, llamando a _cargarCierres()._
+* _cargarCierres()_ : Ejecuta la función _spGenerarCierres_ que crea una _stored procedured_ que toma como parámetro un año y genera todos los cierres de ese año. Luego, llama a esa _Stored Procedured_ con el año 2020. 
+- Descripción de los métodos del archivo _sql.go_ :
+*  _DbConnection()_ : Conexión a la base de datos. Invoca a la función _logErr_.
+* _logErr(err error)_ : Muestra el error si existe.
+* _CrearDB()_ : Creación la base de datos tarjeta.
+* _CrearTablas()_ : Creación de las tablas, llamando a la función _crearTablas_.
+* _CrearPKyFK()_ : Llama a los métodos _crearPK_ y _crearFK_.
+* _EliminarPKyFK()_ : Llama a los métodos _eliminarFK_ y _eliminarPK_.
+* _CargarDB()_ : Llama a la función _cargarDatos_.
+* _GenerarLogicaConsumo()_ : Crea la lógica del consumo llamando a los siguientes métodos encargados de la creación de _stored procedures_ y _triggers_: _spChequearRechazoLimites, spAgregarRechazo, spAutorizarCompra, spAgregarAlertaRechazo, trAgregarAlerta, spTestearConsumo, trAgregarConsumo, spSeguridadCompras, trSeguridadCompras_.
+* _TestearConsumo()_ : Llama a los métodos encargados de crear las _stored procedures_ para realizar el test. Los mismos son: _consumoValidoTest_, _consumoTarjetaInvalidaTest_, _consumoCodSeguridadInvalidoTest_, _consumoExcedeLimiteTest_, _consumoTarjetaExpiradaTest_, _consumoTarjetaSuspendidaTest_, _consumoAlerta1Test_, _consumoAlerta5Test_  y _consumoAlerta32Test_.
+- Descripción de los métodos del archivo _storedProcedures.go_ :
+* _spGenerarCierres()_ : Creación de la _stored procedure_ encargada de generar los cierres del año pasado como parámetro. Recorre las 10 posibles terminaciones de tarjetas y los 12 meses del año y crea los cierres.
+* _spGenerarResumen()_ : Crea una _stored procedure_ que toma como parámetros: _nrocliente, año, mes_ y retorna _true_ si se ha podido generar el resumen y _false_ en caso contrario. Para generarlo, se utiliza la terminación de la tarjeta del _cliente_ y se busca el período solicitado con esa terminación en la tabla _cierre_. En caso de poder generar el resumen, marca las compras involucradas como pagadas.
+* _spChequearRechazoLimites()_ : Crea una _stored procedure_ que toma como parámetro: nrorechazo. Detecta si la tarjeta registra dos rechazos por exceso de límite en el mismo día. En ese caso, cambia el _estado_ de la _tarjeta_ a _suspendida_ e inserta una nueva _alerta_ con _codalerta_: 32.
+* _spAutorizarCompra()_ : Crea una _stored procedure_ con parámetros: _nrotarjeta, codseguridad, nrocomercio_, y _monto_. Devuelve _true_ si la compra fue autorizada y _false_ si fue rechazada.
+* _spAgregarRechazo()_ : Crea una _stored procedure_ que toma como parámetros: _nrotarjeta, nrocomercio, fecha_ y _motivo_ e inserta esos valores en la tabla _rechazo_. Invoca a la función _ChequearRechazoLimites(nrorechazo)_. 
+* _spTestearConsumo()_ : Crea una _stored procedure_ que comprueba si el nuevo insert realizado en consumo es una compra autorizada o rechazada. Llamando a la _stored procedure_ autorizarcompra. En caso de rechazo se agregará a la tabla de rechazos y alertas. En caso de autorización se agregará en la tabla compra.
+* _spAgregarAlertaRechazo()_ : Crea una _stored procedure agregar_alerta_ que agrega una _alerta_ con los valores a insertar en la tabla _rechazo_. Con _codalerta:_ 0. Correspondiente a alertas generadas por rechazo.
+* _spSeguridadCompras()_ :  Es la encargada de crear la función del _trigger_ _compras_lapso_tiempo_. Esta función checkea que las compras en un lapso de tiempo para una tarjeta en diferentes comercios estén dentro del requerimiento solicitado. En caso de detectar dos compras con lapso menor a un minuto ubicadas en el mismo código postal, se deberá insertar una _alerta_ con _codalerta_: 1. En caso de detectar dos compras con lapso menor a 5 minutos con diferentes códigos postales se deberá insertar una nueva _alerta_ con _codalerta_: 5.
+- Descripción de los métodos del archivo _tablas.go_ :
+* _crearTablas()_ : Creación de las tablas _cliente_, _tarjeta_ y _compra_.
+* _crearPK()_ : Creación de las PK de cada tabla. 
+* _crearFK()_ : Creación de las FK de cada tabla.
+* _eliminarPK()_ : Elimina las PK creadas.
+* _eliminarFK()_ : Elimina las FK creadas.
+- Descripción de los métodos del archivo _triggers.go_ :
+* _trAgregarConsumo()_ : Crea un _trigger_ que antes de cada _insert_ en la tabla _consumo_, ejecuta la _stored procedured_: _testear_consumo_. Para corroborar si el consumo será una compra aprobada o rechazada. 
+* _trAgregarAlerta()_ : Crea un _trigger_ que antes de cada _insert_ en la tabla _rechazo_, ejecuta la _stored procedured_: _agregar_alerta_. Esto sucede para que se agreguen todas las alertas de rechazo, con código de alerta: 0.
+* _trSeguridadCompras()_ : Crea un _trigger_ que antes de cada _insert_ en la tabla _compra_, ejecuta la _stored procedured_: _compras_lapso_tiempo_, para corroborar si se ha generado una alerta de código 1 o de código 5. 
 
 - Descripción de los métodos del archivo _noSQL.go_:
 * _CargarDatosNoDB()_: Se conecta a la base de datos y utiliza a las funciones _CargarCliente, CargarTarjeta, CargarComercio_ y _CargarCompra_. Indicando como primer parámetro la base de datos, y luego en orden los datos de _cliente, tarjeta, comercio y compra respectivamente_. Respetando el órden y tipo de dato de sus atributos. Carga tres filas de cada tipo.
