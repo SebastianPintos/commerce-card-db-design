@@ -35,11 +35,23 @@ func CargarDB() {
 	cargarDatos()
 }
 
+func CrearTablas(){
+	crearTablas();
+}
+
+func CrearPKyFK() {
+	crearPK()
+	crearFK()
+}
+
+func EliminarPKyFK() {
+	eliminarFK()
+	eliminarPK()
+}
+
 func GenerarLogicaConsumo() {
 	spChequearRechazoLimites()
 	spAgregarRechazo()
-	spAutorizarCompra()
-
 	spAutorizarCompra()
 
 	spAgregarAlertaRechazo()
@@ -47,7 +59,7 @@ func GenerarLogicaConsumo() {
 
 	spTestearConsumo()
 	trAgregarConsumo()
-	
+
 	spSeguridadCompras()
 	trSeguridadCompras()
 }

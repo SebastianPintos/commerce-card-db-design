@@ -1,6 +1,6 @@
 package sql
 
-func CrearTablas() {
+func crearTablas() {
 	_, err = db.Exec(`DROP SCHEMA public CASCADE`)
 	logErr(err)
 
@@ -75,11 +75,6 @@ func CrearTablas() {
 	logErr(err)
 }
 
-func CrearPKyFK() {
-	crearPK()
-	crearFK()
-}
-
 func crearPK() {
 	_, err = db.Exec(`ALTER TABLE cliente ADD CONSTRAINT cliente_pk PRIMARY KEY (nrocliente);
 					  ALTER TABLE tarjeta ADD CONSTRAINT tarjeta_pk PRIMARY KEY (nrotarjeta);
@@ -106,10 +101,7 @@ func crearFK() {
 	logErr(err)
 }
 
-func EliminarPKyFK() {
-	eliminarFK()
-	eliminarPK()
-}
+
 
 func eliminarPK() {
 	_, err = db.Exec(`ALTER TABLE cliente DROP CONSTRAINT cliente_pk;
