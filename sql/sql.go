@@ -11,7 +11,7 @@ var db *sql.DB
 var err error
 
 func DbConnection() {
-	db, err = sql.Open("postgres", "user=postgres host=localhost dbname=test2 sslmode=disable")
+	db, err = sql.Open("postgres", "user=postgres host=localhost dbname=tarjeta sslmode=disable")
 	logErr(err)
 }
 
@@ -27,12 +27,12 @@ func CrearDB() {
 
 	defer _db.Close()
 
-	_, _err = _db.Exec(`CREATE DATABASE test2`)
+	_, _err = _db.Exec(`CREATE DATABASE tarjeta`)
 	logErr(_err)
 }
 
 func CargarDB() {
-	CargarDatos()
+	cargarDatos()
 }
 
 func GenerarLogicaConsumo() {
@@ -54,4 +54,30 @@ func GenerarLogicaConsumo() {
 
 func GenerarResumen() {
 	spGenerarResumen()
+}
+
+func TestearConsumo() {
+	consumoValidoTest()
+	consumoTarjetaInvalidaTest()
+	consumoCodSeguridadInvalidoTest()
+	consumoExcedeLimiteTest()
+	consumoTarjetaExpiradaTest()
+	consumoTarjetaSuspendidaTest()
+	consumoAlerta1Test()
+	consumoAlerta5Test()
+	consumoAlerta32Test()
+
+	/*Para ejecutar todos los test
+	_, err = db.Query(
+	`   SELECT consumoValidoTest(),
+		consumoTarjetaInvalidaTest(),
+		consumoCodSeguridadInvalidoTest(),
+		consumoExcedeLimiteTest(),
+		consumoTarjetaExpiradaTest(),
+		consumoTarjetaSuspendidaTest(),
+		consumoAlerta1Test(),
+		consumoAlerta5Test(),
+		consumoAlerta32Test();
+		`)
+	logErr(err)*/
 }

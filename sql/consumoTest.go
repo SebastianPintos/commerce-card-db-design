@@ -1,31 +1,5 @@
 package sql
 
-func TestearConsumo() {
-	consumoValidoTest()
-	consumoTarjetaInvalidaTest()
-	consumoCodSeguridadInvalidoTest()
-	consumoExcedeLimiteTest()
-	consumoTarjetaExpiradaTest()
-	consumoTarjetaSuspendidaTest()
-	consumoAlerta1Test()
-	consumoAlerta5Test()
-	consumoAlerta32Test()
-
-	/*Para ejecutar todos los test
-	_, err = db.Query(
-	`   SELECT consumoValidoTest(),
-		consumoTarjetaInvalidaTest(),
-		consumoCodSeguridadInvalidoTest(),
-		consumoExcedeLimiteTest(),
-		consumoTarjetaExpiradaTest(),
-		consumoTarjetaSuspendidaTest(),
-		consumoAlerta1Test(),
-		consumoAlerta5Test(),
-		consumoAlerta32Test();
-		`)
-	logErr(err)*/
-}
-
 func consumoValidoTest() {
 
 	_, err = db.Query(
