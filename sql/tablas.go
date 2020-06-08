@@ -101,8 +101,6 @@ func crearFK() {
 	logErr(err)
 }
 
-
-
 func eliminarPK() {
 	_, err = db.Exec(`ALTER TABLE cliente DROP CONSTRAINT cliente_pk;
 					  ALTER TABLE tarjeta DROP CONSTRAINT tarjeta_pk;

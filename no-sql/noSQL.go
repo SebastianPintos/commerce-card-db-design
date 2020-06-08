@@ -43,31 +43,42 @@ type Compra struct {
 	Pagado       bool
 }
 
-func CargaDatosNoDB() {
-	db, err := bolt.Open("./no-sql/boltDB/test.db", 0600, nil)
+var db *bolt.DB
+var err error
+
+func dbConnection() {
+	db, err = bolt.Open("./no-sql/boltDB/test.db", 0600, nil)
+	logErr(err)
+}
+
+func logErr(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer db.Close()
-
-	CargarCliente(db, 11348773, "Rocío", "Losada", "Av. Presidente Perón 1530", "1151102983")
-	CargarCliente(db, 12349972, "María Estela", "Martínez", "Belgrano 1830", "1150006655")
-	CargarCliente(db, 22648991, "Laura", "Santos", "Italia 220", "1153399452")
-
-	CargarTarjeta(db, "4000001234567899", 11348773, "201508", "202008", "733", 50000, "vigente")
-	CargarTarjeta(db, "4037001554363655", 12349972, "201507", "202007", "332", 55000, "vigente")
-	CargarTarjeta(db, "4000001355435322", 22648991, "201507", "202007", "201", 60000, "vigente")
-
-	CargarComercio(db, 501, "Kevingston", "Av. Tte. Gral. Ricchieri 965", "1661", "46666181")
-	CargarComercio(db, 523, "47 street", "Paunero 1575", "1663", "47597581")
-	CargarComercio(db, 513, "Garbarino", "Av. Bartolomé Mitre 1198", "1661", "08104440018")
-
-	CargarCompra(db, 1, "4000001234567899", 501, "2020-04-25 00:00:00", 1500.00, true)
-	CargarCompra(db, 2, "4000001234567899", 513, "2020-04-27 00:00:00", 4500.00, true)
-	CargarCompra(db, 3, "4000001234567899", 523, "2020-04-30 00:00:00", 850.00, true)
 }
 
-func CargarCliente(db *bolt.DB, nrocliente int, nombre string, apellido string, domicilio string, telefono string) {
+func CargaDatosNoDB() {
+
+	dbConnection()
+
+	cargarCliente(11348773, "Rocío", "Losada", "Av. Presidente Perón 1530", "1151102983")
+	cargarCliente(12349972, "María Estela", "Martínez", "Belgrano 1830", "1150006655")
+	cargarCliente(22648991, "Laura", "Santos", "Italia 220", "1153399452")
+
+	cargarTarjeta("4000001234567899", 11348773, "201508", "202008", "733", 50000, "vigente")
+	cargarTarjeta("4037001554363655", 12349972, "201507", "202007", "332", 55000, "vigente")
+	cargarTarjeta("4000001355435322", 22648991, "201507", "202007", "201", 60000, "vigente")
+
+	cargarComercio(501, "Kevingston", "Av. Tte. Gral. Ricchieri 965", "1661", "46666181")
+	cargarComercio(523, "47 street", "Paunero 1575", "1663", "47597581")
+	cargarComercio(513, "Garbarino", "Av. Bartolomé Mitre 1198", "1661", "08104440018")
+
+	cargarCompra(1, "4000001234567899", 501, "2020-04-25 00:00:00", 1500.00, true)
+	cargarCompra(2, "4000001234567899", 513, "2020-04-27 00:00:00", 4500.00, true)
+	cargarCompra(3, "4000001234567899", 523, "2020-04-30 00:00:00", 850.00, true)
+}
+
+func cargarCliente(nrocliente int, nombre string, apellido string, domicilio string, telefono string) {
 	cliente := Cliente{nrocliente, nombre, apellido, domicilio, telefono}
 
 	data, err := json.Marshal(cliente)
@@ -76,12 +87,9 @@ func CargarCliente(db *bolt.DB, nrocliente int, nombre string, apellido string, 
 	}
 
 	CreateUpdate(db, "Cliente", []byte(strconv.Itoa(cliente.Nrocliente)), data)
-
-	// consulta, err := ReadUnique(db, "Cliente", []byte(strconv.Itoa(cliente.Nrocliente)))
-	// fmt.Printf("%s\n", consulta)
 }
 
-func CargarTarjeta(db *bolt.DB, nrotarjeta string, nrocliente int, validadesde string, validahasta string, codseguridad string, limitecompra int, estado string) {
+func cargarTarjeta(nrotarjeta string, nrocliente int, validadesde string, validahasta string, codseguridad string, limitecompra int, estado string) {
 	tarjeta := Tarjeta{nrotarjeta, nrocliente, validadesde, validahasta, codseguridad, limitecompra, estado}
 
 	data, err := json.Marshal(tarjeta)
@@ -95,7 +103,7 @@ func CargarTarjeta(db *bolt.DB, nrotarjeta string, nrocliente int, validadesde s
 	// fmt.Printf("%s\n", consulta)
 }
 
-func CargarComercio(db *bolt.DB, nrocomercio int, nombre string, domicilio string, codigopostal string, telefono string) {
+func cargarComercio(nrocomercio int, nombre string, domicilio string, codigopostal string, telefono string) {
 	comercio := Comercio{nrocomercio, nombre, domicilio, codigopostal, telefono}
 
 	data, err := json.Marshal(comercio)
@@ -109,7 +117,7 @@ func CargarComercio(db *bolt.DB, nrocomercio int, nombre string, domicilio strin
 	// fmt.Printf("%s\n", consulta)
 }
 
-func CargarCompra(db *bolt.DB, nrooperacion int, nrotarjeta string, nrocomercio int, fecha string, monto int, pagado bool) {
+func cargarCompra(nrooperacion int, nrotarjeta string, nrocomercio int, fecha string, monto int, pagado bool) {
 	compra := Compra{nrooperacion, nrotarjeta, nrocomercio, fecha, monto, pagado}
 
 	data, err := json.Marshal(compra)
