@@ -12,21 +12,21 @@ func spGenerarCierres() {
 		BEGIN
 		FOR terminacion in 0..9 LOOP
 			FOR mes in 1..12 LOOP
-				_mes=mes+1;
-				if(mes=12) THEN
+				_mes = mes + 1;
+				if(mes = 12) THEN
 					_mes=1;
 				END IF;
-				if(mes<10 and _mes<10) THEN
+				if(mes < 10 and _mes < 10) THEN
 					fechainicio=CONCAT(CAST(año as text),'0',CAST(mes as text),'01');
 					fechafin=CONCAT(CAST(año as text),'0',CAST(_mes as text),'01');
 					fechavto=CONCAT(CAST(año as text),'0',CAST(_mes as text),'15');
 				END IF;
-				if(mes>=10 and _mes>=10) THEN
+				if(mes >= 10 and _mes >= 10) THEN
 					fechainicio=CONCAT(CAST(año as text),CAST(mes as text),'01');
 					fechafin=CONCAT(CAST(año as text),CAST(_mes as text),'01');
 					fechavto=CONCAT(CAST(año as text),CAST(_mes as text),'15');
 				END IF;
-				if(mes>=10 and _mes<10) THEN
+				if(mes >= 10 and _mes < 10) THEN
 					fechainicio=CONCAT(CAST(año as text),CAST(mes as text),'01');
 					fechafin=CONCAT(CAST(año as text),CAST(_mes as text),'01');
 					fechavto=CONCAT(CAST(año as text),'0',CAST(_mes as text),'15');
@@ -124,7 +124,7 @@ func spObtenerDisponible() {
 			SELECT coalesce(sum(monto), 0) INTO _consumos 
 			FROM compra
 			WHERE nrotarjeta =_nrotarjeta 
-			  and pagado=False;
+			  and pagado = False;
 			
 			SELECT limitecompra INTO _limite 
 			FROM tarjeta 
@@ -240,36 +240,13 @@ func spAgregarRechazo() {
 		RETURNING nrorechazo INTO numerorechazo;
 
 		--mover INSERT rechazo
-		PERFORM ChequearRechazoLimites(numerorechazo);
+		PERFORM chequearRechazoLimites(numerorechazo);
 
 		END;
 
 	$$ LANGUAGE PLPGSQL;`)
 	logErr(err)
 }
-
-/*func spGenerarConsumo() {
-	_, err = db.Query(
-		`
-		CREATE OR REPLACE FUNCTION generarConsumo(cantidad int)returns void as $$
-		DECLARE
-		  tarjetaAleatoria record;
-		  comercioAleatorio int;
-		  montoAleatorio decimal(7,2);
-		BEGIN
-
-		FOR _consumo in 0..cantidad-1 LOOP
-			montoAleatorio = 999 + random()*99000;
-			PERFORM TRUNC(montoAleatorio,2);
-			SELECT INTO comercioAleatorio nrocomercio FROM comercio ORDER BY random() LIMIT 1;
-			SELECT INTO tarjetaAleatoria * FROM tarjeta ORDER BY random() LIMIT 1;
-			INSERT INTO consumo VALUES(tarjetaAleatoria.nrotarjeta, tarjetaAleatoria.codseguridad, comercioAleatorio, CAST(montoAleatorio as decimal(7,2)));
-		END LOOP;
-		END;
-
-		$$ LANGUAGE PLPGSQL;`)
-	logErr(err)
-}*/
 
 func spTestearConsumo() {
 	_, err = db.Query(

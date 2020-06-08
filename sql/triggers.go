@@ -26,7 +26,7 @@ func trAgregarAlerta() {
 
 func trSeguridadCompras() {
 	_, err = db.Query(
-		`CREATE trigger compras_lapso_tiempo
+		`CREATE trigger compras_lapsotiempo
 		BEFORE INSERT ON compra
 
 		FOR EACH ROW
