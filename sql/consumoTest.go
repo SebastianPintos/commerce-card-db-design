@@ -90,10 +90,8 @@ func spTestConsumoRechazo() {
 			ELSE
 			-- 	Codigo Original
 				INSERT INTO consumo VALUES(_nroTarjeta,_codigoSeguridad,_comercio,cast(_monto as decimal(7,2)));	
-				--RETURN true;
 				RETURN _nroTarjeta;	
 			END IF;
-	--	RETURN _nroTarjeta;
 		END;
 	$$ LANGUAGE PLPGSQL;`)
 	logErr(err)
