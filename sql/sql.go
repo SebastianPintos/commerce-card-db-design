@@ -73,5 +73,5 @@ func GenerarResumen() {
 }
 
 func TestearConsumo() {
-	correrTest()
+	//correrTest()
 }
