@@ -171,12 +171,11 @@ func spTestConsumoAlerta() {
 }
 
 func correrTest() {
-	spObtenerDisponible();
-	spTestConsumoRechazo();
-	spTestConsumoAlerta();
-	 consumoTest();
-	 alertaTest();
-	 _, err = db.Query(
+	spTestConsumoRechazo()
+	spTestConsumoAlerta()
+	consumoTest()
+	alertaTest()
+	_, err = db.Query(
 		`   SELECT consumoTest(''),
 			consumoTest('Tarjeta no válida'),
 			consumoTest('La tarjeta se encuentra suspendida'),
@@ -187,7 +186,7 @@ func correrTest() {
 			alertaTest(5),
 			alertaTest(32);
 			`)
-	logErr(err);
+	logErr(err)
 }
 
 func consumoTest() {
