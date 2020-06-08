@@ -1,5 +1,168 @@
 package sql
 
+func spTestConsumoRechazo() {
+	_, err = db.Query(
+		`CREATE OR REPLACE FUNCTION testConsumoRechazo(rechazo text default null) returns bool as $$  
+			-- Rechazos: 
+			-- 	null consumo sin rechazo
+			-- 'TarjetaInvalida'
+			-- 'CodigoInvalido'
+			-- 'LimiteSuperado' 
+			-- 'TarjetaExpirada'
+			DECLARE
+				_nroTarjeta char(16);
+				_codigoSeguridad char(4);
+				_comercio int;
+				_monto decimal(8,2);
+				_disponible decimal(8,2);
+	
+			BEGIN 
+		
+			IF(rechazo is not null) THEN
+				IF(rechazo not in('TarjetaInvalida', 'CodigoInvalido', 'LimiteSuperado', 'TarjetaExpirada')) THEN
+					RETURN false;
+				END IF;
+			END IF;
+		   
+		-- Comercio aleatorio
+			SELECT nrocomercio INTO _comercio 
+			FROM comercio 
+			order by random() limit 1;
+	
+		-- Genero monto al azar
+			_monto = random()*(1000-100)+100;
+	
+			-- Genera caso con rechazo tarjeta invalida
+			if(rechazo = 'TarjetaInvalida') THEN
+				SELECT nrotarjeta, codseguridad, obtenerDisponible(nrotarjeta) as disponible
+				into _nroTarjeta, _codigoSeguridad 
+				FROM tarjeta 
+				WHERE estado != 'vigente' 
+			  	  and obtenerDisponible(nrotarjeta) > 1000
+				ORDER BY random()
+				LIMIT 1;
+			ELSE
+				SELECT nrotarjeta, codseguridad, obtenerDisponible(nrotarjeta)
+				into _nroTarjeta, _codigoSeguridad, _disponible
+				FROM tarjeta 
+				WHERE estado = 'vigente' 
+			  	  and obtenerDisponible(nrotarjeta) > 1000
+				ORDER BY random()
+				LIMIT 1;
+	
+				if(rechazo = 'CodigoInvalido') THEN
+					_codigoSeguridad = (_codigoSeguridad::int  + 1)::char(4);	
+				END IF;
+	
+				if(rechazo = 'LimiteSuperado') THEN
+					_monto = _disponible  + 100;
+				END IF;
+	
+				if(rechazo = 'TarjetaExpirada') THEN
+					SELECT tf.nrotarjeta, tf.codseguridad
+					INTO _nroTarjeta, _codigoSeguridad
+					FROM (SELECT ((TO_DATE(validahasta ||'01','YYYYMMDD')) +  interval '1 month') as fechavence, nrotarjeta, codseguridad FROM tarjeta) as tf
+					WHERE tf.fechavence < current_date
+					ORDER BY random();
+				END IF;
+	
+			END IF;
+	
+			IF(_nroTarjeta is null) THEN
+				RETURN false;
+			ELSE
+			-- 	Codigo Original
+				INSERT INTO consumo VALUES(_nroTarjeta,_codigoSeguridad,_comercio,_monto);	
+				RETURN true;	
+			END IF;
+	
+		END;
+	$$ LANGUAGE PLPGSQL;`)
+	logErr(err)
+}
+
+func spTestConsumoAlerta() {
+	_, err = db.Query(
+		`CREATE OR REPLACE FUNCTION testConsumoAlerta(alerta int) returns bool as $$  
+		-- codalerta: 
+		-- 1: compra 1min
+		-- 5: compra 5min
+		-- 32: límite
+		DECLARE
+			_nroTarjeta char(16);
+			_codigoSeguridad char(4);
+			_comercio int;
+			_monto decimal(8,2);
+			_codPostal char(8);
+	
+		BEGIN 
+			IF (alerta not in (1,5,32)) THEN
+				Return false;
+			END IF;
+		
+		-- Selecciono una tarjeta al azar	
+			SELECT nrotarjeta, codseguridad
+			INTO _nroTarjeta, _codigoSeguridad
+			FROM tarjeta 
+			WHERE estado = 'vigente' 
+			  and obtenerDisponible(nrotarjeta) > 1000
+			ORDER BY random()
+			LIMIT 1;	
+	
+		-- Comercio aleatorio inicial
+			SELECT nrocomercio, codigopostal INTO _comercio, _codPostal 
+			FROM comercio 
+			order by random() limit 1;
+	
+			FOR tarjeta IN 1 .. 2 BY 1
+			LOOP
+				-- Genero monto al azar
+				_monto = random()*(1000-100)+100;
+				
+				IF(alerta = 1) THEN
+					SELECT nrocomercio, codigopostal 
+					INTO _comercio, _codPostal 
+					FROM comercio 
+					WHERE codigopostal = _codPostal 
+					and nrocomercio != _comercio
+					order by random() 
+					limit 1;
+				END IF;
+	
+				IF(alerta = 5) THEN
+					SELECT nrocomercio, codigopostal 
+					INTO _comercio, _codPostal 
+					FROM comercio 
+					WHERE codigopostal != _codPostal 
+					order by random() 
+					limit 1;
+				END IF;
+	
+				IF(alerta = 32) THEN
+					_monto = 99999;
+				END IF;
+	
+				INSERT INTO consumo VALUES(_nroTarjeta,_codigoSeguridad,_comercio,_monto);			
+			END LOOP;		
+	
+			RETURN true;	
+			END;
+		$$ LANGUAGE PLPGSQL;`)
+	logErr(err)
+}
+
+func CorrerTest() {
+	_, err = db.Exec(`select testConsumoRechazo();
+					  select testConsumoRechazo('TarjetaInvalida');
+					  select testConsumoRechazo('CodigoInvalido');
+					  select testConsumoRechazo('LimiteSuperado');
+					  select testConsumoRechazo('TarjetaExpirada');
+					  select testConsumoAlerta(1);
+					  select testConsumoAlerta(5);
+					  select testConsumoAlerta(32);`)
+	logErr(err)
+}
+
 func consumoValidoTest() {
 
 	_, err = db.Query(

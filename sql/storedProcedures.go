@@ -113,6 +113,30 @@ func spGenerarResumen() {
 	logErr(err)
 }
 
+func spObtenerDisponible() {
+	_, err = db.Query(
+		`CREATE OR REPLACE FUNCTION obtenerDisponible(_nrotarjeta char(16))returns decimal(8,2) as $$
+		DECLARE
+			_limite decimal(8,2);
+			_consumos decimal(8,2);
+			
+		BEGIN	
+			SELECT coalesce(sum(monto), 0) INTO _consumos 
+			FROM compra
+			WHERE nrotarjeta =_nrotarjeta 
+			  and pagado=False;
+			
+			SELECT limitecompra INTO _limite 
+			FROM tarjeta 
+			WHERE nrotarjeta = _nrotarjeta;
+			
+			RETURN _limite - _consumos;
+		END;	
+		
+	$$ LANGUAGE PLPGSQL;`)
+	logErr(err)
+}
+
 func spChequearRechazoLimites() {
 	_, err = db.Query(
 		`CREATE OR REPLACE FUNCTION chequearRechazoLimites(numerOR int) returns void as $$
@@ -310,5 +334,3 @@ func spSeguridadCompras() {
 	`)
 	logErr(err)
 }
-
-

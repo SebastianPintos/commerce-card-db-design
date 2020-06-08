@@ -33,9 +33,12 @@ func CrearDB() {
 
 func CargarDB() {
 	cargarDatos()
+	cargarCierres()
 }
 
 func GenerarLogicaConsumo() {
+	spObtenerDisponible()
+
 	spChequearRechazoLimites()
 	spAgregarRechazo()
 	spAutorizarCompra()
@@ -47,7 +50,7 @@ func GenerarLogicaConsumo() {
 
 	spTestearConsumo()
 	trAgregarConsumo()
-	
+
 	spSeguridadCompras()
 	trSeguridadCompras()
 }
@@ -57,15 +60,20 @@ func GenerarResumen() {
 }
 
 func TestearConsumo() {
-	consumoValidoTest()
-	consumoTarjetaInvalidaTest()
-	consumoCodSeguridadInvalidoTest()
-	consumoExcedeLimiteTest()
-	consumoTarjetaExpiradaTest()
-	consumoTarjetaSuspendidaTest()
-	consumoAlerta1Test()
-	consumoAlerta5Test()
-	consumoAlerta32Test()
+	spTestConsumoRechazo()
+	spTestConsumoAlerta()
+
+	CorrerTest()
+
+	// consumoValidoTest()
+	// consumoTarjetaInvalidaTest()
+	// consumoCodSeguridadInvalidoTest()
+	// consumoExcedeLimiteTest()
+	// consumoTarjetaExpiradaTest()
+	// consumoTarjetaSuspendidaTest()
+	// consumoAlerta1Test()
+	// consumoAlerta5Test()
+	// consumoAlerta32Test()
 
 	/*Para ejecutar todos los test
 	_, err = db.Query(

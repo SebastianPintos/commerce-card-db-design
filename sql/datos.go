@@ -68,8 +68,6 @@ func cargarDatos() {
 
 					  `)
 	logErr(err)
-
-	cargarCierres()
 }
 
 func cargarCierres() {
