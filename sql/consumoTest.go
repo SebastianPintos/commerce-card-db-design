@@ -388,8 +388,9 @@ func consumoAlerta32Test() {
 		BEGIN
 		INSERT INTO consumo VALUES(4037001554363655,332,520,99999);
 		INSERT INTO consumo VALUES(4037001554363655,332,520,99999);
-		SELECT INTO cantidad COUNT(*) FROM alerta WHERE nrotarjeta = '4037001554363655' 
-		AND codalerta = 32;
+		SELECT INTO cantidad COUNT(*) FROM alerta, tarjeta WHERE alerta.nrotarjeta = '4037001554363655'
+		AND tarjeta.nrotarjeta = '4037001554363655' AND tarjeta.estado = 'suspendida' 
+		AND alerta.codalerta = 32;
 		
 		if(cantidad = 1) THEN
 			raise notice 'Test consumo alerta 32: True';

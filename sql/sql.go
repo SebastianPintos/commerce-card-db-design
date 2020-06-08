@@ -36,13 +36,25 @@ func CargarDB() {
 	cargarCierres()
 }
 
+func CrearTablas(){
+	crearTablas();
+}
+
+func CrearPKyFK() {
+	crearPK()
+	crearFK()
+}
+
+func EliminarPKyFK() {
+	eliminarFK()
+	eliminarPK()
+}
+
 func GenerarLogicaConsumo() {
 	spObtenerDisponible()
 
 	spChequearRechazoLimites()
 	spAgregarRechazo()
-	spAutorizarCompra()
-
 	spAutorizarCompra()
 
 	spAgregarAlertaRechazo()
