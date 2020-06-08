@@ -2,114 +2,111 @@ package sql
 
 func spGenerarCierres() {
 	_, err = db.Query(
-		`
-		CREATE OR REPLACE FUNCTION generarCierres(año int)returns void as $$
-		DECLARE
-		  fechainicio text;
-		  fechafin text;
-		  fechavto text;
-		  _mes int;
+		`create or replace function generarCierres(anio int) returns void as $$
+		Declare
+			fdesde date;
+			fhasta date;
+			fvto date;
 		BEGIN
-		FOR terminacion in 0..9 LOOP
-			FOR mes in 1..12 LOOP
-				_mes = mes + 1;
-				if(mes = 12) THEN
-					_mes=1;
-				END IF;
-				if(mes < 10 and _mes < 10) THEN
-					fechainicio=CONCAT(CAST(año as text),'0',CAST(mes as text),'01');
-					fechafin=CONCAT(CAST(año as text),'0',CAST(_mes as text),'01');
-					fechavto=CONCAT(CAST(año as text),'0',CAST(_mes as text),'15');
-				END IF;
-				if(mes >= 10 and _mes >= 10) THEN
-					fechainicio=CONCAT(CAST(año as text),CAST(mes as text),'01');
-					fechafin=CONCAT(CAST(año as text),CAST(_mes as text),'01');
-					fechavto=CONCAT(CAST(año as text),CAST(_mes as text),'15');
-				END IF;
-				if(mes >= 10 and _mes < 10) THEN
-					fechainicio=CONCAT(CAST(año as text),CAST(mes as text),'01');
-					fechafin=CONCAT(CAST(año as text),CAST(_mes as text),'01');
-					fechavto=CONCAT(CAST(año as text),'0',CAST(_mes as text),'15');
-				END IF;
-
-				INSERT INTO cierre VALUES(año, mes, terminacion, TO_DATE(fechainicio,'YYYYMMDD'), TO_DATE(fechafin,'YYYYMMDD'), TO_DATE(fechavto,'YYYYMMDD'));
-
+		
+			FOR tarjeta IN 0 .. 9 BY 1
+			LOOP
+				SELECT into fdesde to_date((anio - 1)::text || '12' || (select 23 + trunc(random() * 4))::text, 'YYYYMMDD');
+				SELECT into fhasta fdesde::date + cast((select 29 + trunc(random() * 2))::text || ' days' as interval);
+				SELECT into fvto fhasta::date + cast('10 days' as interval);
+				
+				FOR mes IN 1 .. 12 BY 1
+				LOOP			
+					insert into cierre values(anio,mes,tarjeta,fdesde,fhasta, fvto);
+					
+					SELECT into fdesde fhasta::date + cast('1 days' as interval);
+					SELECT into fhasta fdesde::date + cast((select 29 + trunc(random() * 2))::text || ' days' as interval);
+					SELECT into fvto fhasta::date + cast('10 days' as interval);
+				END LOOP;
 			END LOOP;
-		END LOOP;
-
 		END;
-
-		$$ LANGUAGE PLPGSQL;`)
+		$$ language plpgsql;`)
 
 	logErr(err)
 }
 
 func spGenerarResumen() {
 	_, err = db.Query(
-		`CREATE OR REPLACE FUNCTION generarResumen(cliente int, aniOR int, mesR int) returns bool as $$
-		DECLARE
+		`create or replace function generarResumen(cliente int, anioR int, mesR int) returns bool as $$
+		declare
 			   idResumen int;
-			   totalPagar decimal(8,2) := 0;
+			   totalPagar decimal(7,2) := 0;
 			   _linea record;
+			   tarjeta char(16);
+		   
+				begin		
 				
-		BEGIN
-		-- 	Generar Cabecera
-			INSERT INTO cabecera (nombre, apellido, domicilio, nrotarjeta, desde, hasta, vence)
-			SELECT cli.nombre, cli.apellido, cli.domicilio, t.nrotarjeta, c.fechainicio, c.fechacierre, c.fechavto
-			FROM public.tarjeta t, public.cierre c, public.cliente cli
-			WHERE SUBSTRING (t.nrotarjeta, LENGTH(t.nrotarjeta), 1)::int = c.terminacion
-			and cli.nrocliente = t.nrocliente
-			and t.nrocliente = cliente
-			and c.año = anioR
-			and c.mes = mesR
-			RETURNING nroresumen INTO idResumen;
-
-			if (idResumen is null) then
+				FOR tarjeta IN 
+					Select nrotarjeta
+					From Tarjeta
+					Where nrocliente = cliente
+				LOOP
+				
+				-- 	Generar Cabecera
+					INSERT INTO cabecera (nombre, apellido, domicilio, nrotarjeta, desde, hasta, vence) 
+					SELECT cli.nombre, cli.apellido, cli.domicilio, t.nrotarjeta, c.fechainicio, c.fechacierre, c.fechavto
+						FROM public.tarjeta t, public.cierre c, public.cliente cli
+						WHERE SUBSTRING (t.nrotarjeta, LENGTH(t.nrotarjeta), 1)::int = c.terminacion
+						and cli.nrocliente = t.nrocliente
+						and t.nrotarjeta = tarjeta
+						and c.año = anioR
+						and c.mes = mesR
+					RETURNING nroresumen INTO idResumen;
+				
+					if (idResumen is null) then
 						raise 'No se pudo generar el resumen, Cliente inexistente';
 						return False;
-			END IF;
-
-		-- Generar detalle
-			INSERT INTO detalle (nroresumen, nrolinea, fecha, nombrecomercio, monto)
-			SELECT idResumen, ROW_NUMBER () OVER (ORDER BY t.nrotarjeta) as nrolinea, co.fecha, com.nombre , co.monto
-				FROM public.tarjeta t, public.cierre c, public.compra co, public.comercio com
-				WHERE SUBSTRING (t.nrotarjeta, LENGTH(t.nrotarjeta), 1)::int = c.terminacion
-				and co.nrotarjeta = t.nrotarjeta
-				and com.nrocomercio = co.nrocomercio
-				and t.nrocliente = cliente
-				and c.año = anioR
-				and c.mes = mesR
-				and co.fecha >= c.fechainicio
-				and co.fecha <= c.fechacierre;
-
-			if (lastval() is NULL) then
-					raise 'No se pudo generar el resumen';
-					return False;
-			END IF;
-
-		-- Actualizar Resumen
-			totalPagar := (SELECT SUM(monto)
-								FROM detalle
-								WHERE nroresumen = idResumen
-								GROUP BY nroresumen);
-			UPDATE cabecera
-				SET total = totalPagar WHERE nroresumen = idResumen;
-
-			--Cambiar pagado a True
-			for _linea in SELECT * FROM public.tarjeta t, public.cierre c, public.compra co, public.comercio com
-				WHERE SUBSTRING (t.nrotarjeta, LENGTH(t.nrotarjeta), 1)::int = c.terminacion
-				and co.nrotarjeta = t.nrotarjeta
-				and com.nrocomercio = co.nrocomercio
-				and t.nrocliente = cliente loop
-
-						UPDATE compra set pagado = True where nrotarjeta=_linea.nrotarjeta and monto=_linea.monto;				
-					
-			END LOOP;	
+					end if;	
+		
+				-- Generar detalle	
+					INSERT INTO detalle (nroresumen, nrolinea, fecha, nombrecomercio, monto) 
+					SELECT idResumen, ROW_NUMBER () OVER (ORDER BY t.nrotarjeta) as nrolinea, co.fecha, com.nombre , co.monto
+					FROM public.tarjeta t, public.cierre c, public.compra co, public.comercio com
+					WHERE SUBSTRING (t.nrotarjeta, LENGTH(t.nrotarjeta), 1)::int = c.terminacion
+					and co.nrotarjeta = t.nrotarjeta
+					and com.nrocomercio = co.nrocomercio
+					and t.nrocliente = cliente
+					and c.año = anioR
+					and c.mes = mesR
+					and co.fecha >= c.fechainicio 
+					and co.fecha <= c.fechacierre;	
 				
-			return True;
-
-		END;
-		$$ LANGUAGE PLPGSQL;`)
+					if (lastval() is NULL) then
+						raise 'No se pudo generar el resumen';
+						return False;
+					end if;	
+			
+				-- Actualizar Resumen
+					totalPagar := (SELECT SUM(monto) 
+								  FROM detalle 
+								  WHERE nroresumen = idResumen
+								  GROUP BY nroresumen);
+					 
+					UPDATE cabecera 
+					set total = COALESCE(NULLIF(totalPagar, 0), 0)
+					WHERE nroresumen = idResumen;	
+					
+				--Cambiar pagado a True
+					FOR _linea in SELECT * FROM public.tarjeta t, public.cierre c, public.compra co, public.comercio com
+						WHERE SUBSTRING (t.nrotarjeta, LENGTH(t.nrotarjeta), 1)::int = c.terminacion
+						and co.nrotarjeta = t.nrotarjeta
+						and com.nrocomercio = co.nrocomercio
+						and t.nrocliente = cliente 
+					LOOP
+						UPDATE compra set pagado = True where nrotarjeta=_linea.nrotarjeta and monto=_linea.monto;									
+					END LOOP;
+				
+				END LOOP;
+				
+				return True;
+				
+				   end;
+		$$ language plpgsql;`)
 	logErr(err)
 }
 
@@ -134,7 +131,7 @@ func spGenerarResumenesPeriodo() {
 
 	_, err = db.Query(
 		`SELECT generarResumenesPeriodo(2020,06);`)
-		
+
 	logErr(err)
 }
 
