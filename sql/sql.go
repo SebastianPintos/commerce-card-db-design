@@ -69,6 +69,7 @@ func GenerarLogicaConsumo() {
 
 func GenerarResumen() {
 	spGenerarResumen()
+	spGenerarResumenesPeriodo()
 }
 
 func TestearConsumo() {

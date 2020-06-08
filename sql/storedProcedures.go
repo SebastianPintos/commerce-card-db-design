@@ -113,6 +113,31 @@ func spGenerarResumen() {
 	logErr(err)
 }
 
+func spGenerarResumenesPeriodo() {
+	_, err = db.Query(
+		`CREATE OR REPLACE FUNCTION generarResumenesPeriodo(aniOR int, mesR int) returns void as $$
+		DECLARE
+			   _linea record;
+				
+		BEGIN
+		FOR _linea in SELECT * FROM compra, cliente, tarjeta 
+			WHERE compra.pagado = False 
+			AND compra.nrotarjeta = tarjeta.nrotarjeta
+			AND tarjeta.nrocliente = cliente.nrocliente
+			AND compra.pagado = False LOOP
+				perform generarResumen(_linea.nrocliente, anioR, mesR);
+		END LOOP;
+		END;
+		$$ LANGUAGE PLPGSQL;`)
+
+	logErr(err)
+
+	_, err = db.Query(
+		`SELECT generarResumenesPeriodo(2020,06);`)
+		
+	logErr(err)
+}
+
 func spObtenerDisponible() {
 	_, err = db.Query(
 		`CREATE OR REPLACE FUNCTION obtenerDisponible(_nrotarjeta char(16))returns decimal(8,2) as $$
