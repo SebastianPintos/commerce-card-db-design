@@ -118,11 +118,14 @@ func spGenerarResumenesPeriodo() {
 			   _linea record;
 				
 		BEGIN
-		FOR _linea in SELECT * FROM compra, cliente, tarjeta 
-			WHERE compra.pagado = False 
-			AND compra.nrotarjeta = tarjeta.nrotarjeta
-			AND tarjeta.nrocliente = cliente.nrocliente
-			AND compra.pagado = False LOOP
+		FOR _linea in 
+			SELECT cli.nrocliente
+			FROM compra co , cliente cli, tarjeta tr
+			WHERE co.nrotarjeta = tr.nrotarjeta
+			  AND tr.nrocliente = cli.nrocliente
+			  AND co.pagado = False
+			GROUP BY cli.nrocliente
+		LOOP
 				perform generarResumen(_linea.nrocliente, anioR, mesR);
 		END LOOP;
 		END;
