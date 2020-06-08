@@ -45,6 +45,7 @@ func spGenerarResumen() {
 					Select nrotarjeta
 					From Tarjeta
 					Where nrocliente = cliente
+					and estado = 'vigente'
 				LOOP
 				
 				-- 	Generar Cabecera
@@ -70,7 +71,7 @@ func spGenerarResumen() {
 					WHERE SUBSTRING (t.nrotarjeta, LENGTH(t.nrotarjeta), 1)::int = c.terminacion
 					and co.nrotarjeta = t.nrotarjeta
 					and com.nrocomercio = co.nrocomercio
-					and t.nrocliente = cliente
+					and t.nrotarjeta = tarjeta
 					and c.año = anioR
 					and c.mes = mesR
 					and co.fecha >= c.fechainicio 
@@ -96,7 +97,7 @@ func spGenerarResumen() {
 						WHERE SUBSTRING (t.nrotarjeta, LENGTH(t.nrotarjeta), 1)::int = c.terminacion
 						and co.nrotarjeta = t.nrotarjeta
 						and com.nrocomercio = co.nrocomercio
-						and t.nrocliente = cliente 
+						and t.nrotarjeta = tarjeta 
 					LOOP
 						UPDATE compra set pagado = True where nrotarjeta=_linea.nrotarjeta and monto=_linea.monto;									
 					END LOOP;
